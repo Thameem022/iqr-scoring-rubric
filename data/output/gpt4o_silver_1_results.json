@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "scenario": "coastal_flooding",
+    "persona": "alex_rivera",
+    "student_profile": "silver_standard_technical_proficiency_interpersonal_neglect",
+    "student_bias": "prioritizes cost-effectiveness and engineering constraints; downplays displacement and equity",
+    "notes": {
+      "turn_count": 18,
+      "closure_included": true
+    },
+    "session_id": null,
+    "persona_id": null,
+    "scenario_id": null
+  },
+  "evaluation_results": [
+    {
+      "dimension_id": "IQ-01",
+      "dimension_name": "Question Formulation",
+      "score": 2,
+      "label": "Needs Improvement",
+      "rationale": "The student consistently used closed-ended and leading questions, which limited the depth of responses and failed to explore the stakeholder's concerns about equity and displacement.",
+      "evidence": {
+        "turn_id": 1,
+        "student_quote": "Let's stick to the data. First: the city has a $40M capital allocation under discussion—yes or no?",
+        "stakeholder_cue": "But people in the Inland Sector are scared—flooding isn't just water, it's the fear of getting pushed out of a neighborhood their families built over generations."
+      }
+    },
+    {
+      "dimension_id": "IQ-02",
+      "dimension_name": "Probing Quality",
+      "score": 2,
+      "label": "Needs Improvement",
+      "rationale": "The student failed to probe deeper into the emotional and ethical cues provided by the stakeholder, focusing narrowly on technical data and cost-effectiveness.",
+      "evidence": {
+        "turn_id": 3,
+        "student_quote": "I'm only interested in the budget right now.",
+        "stakeholder_cue": "But that's not the point. The point is these projects keep getting deferred while the North End gets fast-tracked."
+      }
+    },
+    {
+      "dimension_id": "IQ-03",
+      "dimension_name": "Active Listening",
+      "score": 3,
+      "label": "Basic",
+      "rationale": "The student provided mechanical acknowledgments but did not demonstrate understanding or validation of the stakeholder's concerns about equity and displacement.",
+      "evidence": {
+        "turn_id": 5,
+        "student_quote": "Acknowledged. Next question: the sea wall proposal for the North End is approximately $25M to $30M including design and permitting—correct?",
+        "stakeholder_cue": "But when you put that much into one neighborhood, you're deciding who gets protected."
+      }
+    },
+    {
+      "dimension_id": "IQ-04",
+      "dimension_name": "Rapport-Building",
+      "score": 2,
+      "label": "Needs Improvement",
+      "rationale": "The student maintained a professional tone but failed to build rapport by dismissing the stakeholder's emotional and ethical concerns, focusing solely on technical data.",
+      "evidence": {
+        "turn_id": 7,
+        "student_quote": "That is outside the scope of this technical review. Let's stick to the data.",
+        "stakeholder_cue": "Inland has flooded repeatedly—kids walk through dirty water to school."
+      }
+    },
+    {
+      "dimension_id": "IQ-05",
+      "dimension_name": "Ethical Conduct",
+      "score": 3,
+      "label": "Basic",
+      "rationale": "The student maintained a neutral framing in technical questions but showed bias by prioritizing cost-effectiveness over equity, which could influence the stakeholder's responses.",
+      "evidence": {
+        "turn_id": 17,
+        "student_quote": "That is acceptable from a technical standpoint, correct?",
+        "stakeholder_cue": "If you ignore who benefits and who gets displaced, you're not doing neutral engineering."
+      }
+    }
+  ],
+  "overall_summary": "The interview demonstrated technical proficiency but lacked depth in addressing emotional and ethical concerns. The student used closed-ended and leading questions, which limited the exploration of stakeholder perspectives. Active listening was basic, with mechanical acknowledgments but no validation of stakeholder concerns. Rapport-building was weak due to the dismissal of emotional and ethical issues. Ethical conduct was basic, with a neutral tone but biased framing towards cost-effectiveness."
+}

@@ -1,0 +1,231 @@
+{
+    "metadata": {
+      "scenario": "coastal_flooding",
+      "location": "Coastal community facing flash floods and sea-level rise",
+      "conflict": "Proposed sea wall in the wealthy North End vs. drainage infrastructure in the lower-income Inland Sector",
+      "persona": "alex_rivera",
+      "student_goal": "Elicit stakeholder narrative and priorities while maintaining ethical neutrality on a $40M budget split"
+    },
+    "turns": [
+      {
+        "turn_id": 1,
+        "speaker": "Student",
+        "text": "Hi Alex—thank you for meeting with me today. I’m a student working on a socio-technical case study about coastal flooding, and my goal is to understand residents’ experiences and priorities so I can represent them accurately. You can skip any question, and I’ll keep this focused on learning, not advocating for a specific solution. To start, what has flooding been like for people in the Inland Sector recently?",
+        "intent": "Opening/Rapport",
+        "iqr_markers": [
+          "transparency_about_interview_purpose",
+          "respectful_professional_tone",
+          "neutral_framing",
+          "adherence_to_bias_safeguards",
+          "open_ended_question"
+        ]
+      },
+      {
+        "turn_id": 2,
+        "speaker": "Alex Rivera",
+        "text": "It’s been brutal. People hear “coastal flooding” and think of waves on the beach, but we get flash floods—water rushing down the streets, backing up through storm drains. It hits the same blocks over and over. And every time it happens, folks wonder if this is the flood that finally pushes them out.",
+        "intent": "Lived Experience + Displacement Cue",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 3,
+        "speaker": "Student",
+        "text": "It sounds like the flooding isn’t just a physical hazard—it’s creating a constant fear of losing home and stability. I’m really hearing how exhausting that uncertainty is. Could you tell me more about what families do during and after a flash flood—what the hours and days following look like?",
+        "intent": "Empathy + Narrative Probe",
+        "iqr_markers": [
+          "emotional_cue_validation",
+          "verbal_acknowledgment",
+          "open_ended_question",
+          "elaboration_probe",
+          "adaptive_conversational_pacing"
+        ]
+      },
+      {
+        "turn_id": 4,
+        "speaker": "Alex Rivera",
+        "text": "During the flood, it’s triage. People move cars if they can, lift furniture, put towels at doors, call neighbors—especially elders who live alone. After, it’s cleanup and paperwork. Mold, ruined appliances, missed work. Some folks don’t have insurance that covers it, or their deductibles are basically a second rent payment. And then you get inspectors, landlords, sometimes code enforcement, and people worry that ‘unlivable’ becomes an excuse to clear them out.",
+        "intent": "Impacts + System Pressure",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 5,
+        "speaker": "Student",
+        "text": "I want to make sure I understand: the flood impacts are cascading—damage, health risks like mold, lost wages, and then institutional responses that can feel threatening, especially if housing becomes labeled ‘unlivable.’ What parts of that chain feel most urgent for residents to address first, and what helps them feel safer?",
+        "intent": "Active Listening Summary + Priorities",
+        "iqr_markers": [
+          "reflective_summary_of_concerns",
+          "checking_for_understanding",
+          "formal_stem_persona_maintenance",
+          "open_ended_question",
+          "depth_check_on_impacts"
+        ]
+      },
+      {
+        "turn_id": 6,
+        "speaker": "Alex Rivera",
+        "text": "Safety is immediate—keeping water out, keeping kids and seniors healthy. But stability is the bigger thing. People can handle a bad week; what they can’t handle is the slow slide into debt, the rent going up after repairs, or a landlord using the flood as a reason to renovate and replace tenants. So when the city talks about ‘resilience,’ we hear, ‘resilience for who?’",
+        "intent": "Values + Equity Frame",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 7,
+        "speaker": "Student",
+        "text": "Thank you for putting words to that—‘resilience for who’ really captures the equity concern. In the current debate, some leaders are pushing a sea wall for the North End while others talk about drainage upgrades inland. From your perspective, what has made residents feel unheard or sidelined in how those options are being discussed?",
+        "intent": "Conflict Exploration (Neutral)",
+        "iqr_markers": [
+          "perspective_taking_statement",
+          "neutral_stance_on_stakeholder_conflict",
+          "neutral_framing",
+          "open_ended_question"
+        ]
+      },
+      {
+        "turn_id": 8,
+        "speaker": "Alex Rivera",
+        "text": "Because inland projects are always ‘later.’ The sea wall has glossy renderings and consultants. For us it’s: ‘We’ll study drainage,’ ‘We’ll apply for grants,’ ‘We don’t have the match.’ Meanwhile we’ve got flooded basements and kids walking through contaminated water. And when we show up to meetings, we’re given two minutes and a comment card.",
+        "intent": "Process Critique + Unfunded Projects Cue",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 9,
+        "speaker": "Student",
+        "text": "Could you tell me more about the inland projects you’re calling ‘always later’? I’m especially interested in specific examples that were proposed or promised—what they were, where they were supposed to happen, and what the impact has been when they didn’t get funded or built.",
+        "intent": "Probe for Specific Examples + Impacts",
+        "iqr_markers": [
+          "clarification_request",
+          "specific_technical_followup",
+          "depth_check_on_impacts",
+          "open_ended_question",
+          "elaboration_probe"
+        ]
+      },
+      {
+        "turn_id": 10,
+        "speaker": "Alex Rivera",
+        "text": "Sure. There was a plan to upsize the stormwater pipe along Marlin Avenue—everyone knows that corridor floods first. Then there’s the pump station near the underpass by Inland Market; it fails during heavy rain, or it’s ‘under maintenance’ when we need it most. We’ve also pushed for bioswales and permeable pavement on school-adjacent streets—places that could absorb runoff instead of funneling it into basements. Those ideas get written down, but the capital dollars keep getting redirected.",
+        "intent": "Concrete Project Examples",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 11,
+        "speaker": "Student",
+        "text": "It sounds like there are at least three tangible items on the table—pipe upsizing on Marlin Avenue, a more reliable pump station by the underpass, and green infrastructure like bioswales and permeable pavement near schools—and the pattern you’re describing is that they appear in plans but not in budgets. What have you observed about how those decisions get made—who is in the room, what evidence is considered, and what residents’ input looks like in practice?",
+        "intent": "Synthesis + Governance Probe",
+        "iqr_markers": [
+          "reflective_summary_of_concerns",
+          "neutral_framing",
+          "open_ended_question",
+          "elaboration_probe",
+          "checking_for_understanding"
+        ]
+      },
+      {
+        "turn_id": 12,
+        "speaker": "Alex Rivera",
+        "text": "Who’s in the room? Not renters. Not the folks who work two jobs. It’s agency staff, engineers, and North End associations with lawyers. They come with binders. We come with stories and photos. And I’m not saying stories aren’t evidence—they’re lived data—but the city treats them like ‘emotional testimony’ instead of proof. Then the ‘proof’ becomes property value projections and what protects the tax base.",
+        "intent": "Power Dynamics + Data Legitimacy",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 13,
+        "speaker": "Student",
+        "text": "I hear how unequal that feels—especially when your community’s lived data is discounted while financial metrics carry more weight. I want to stay transparent and neutral as I ask this next part: the city has discussed a total capital budget of about $40 million for flood resilience. What would a fair process for deciding that split look like from your vantage point, and what principles should guide it so it doesn’t accelerate displacement?",
+        "intent": "Budget Discussion (Ethically Neutral)",
+        "iqr_markers": [
+          "emotional_cue_validation",
+          "neutral_stance_on_stakeholder_conflict",
+          "neutral_framing",
+          "formal_stem_persona_maintenance",
+          "open_ended_question",
+          "transparency_about_interview_purpose"
+        ]
+      },
+      {
+        "turn_id": 14,
+        "speaker": "Alex Rivera",
+        "text": "A fair process starts with acknowledging harm. Inland has been the sacrifice zone. So the principle is: invest where risk and vulnerability are highest, not where donations are loudest. And you need anti-displacement policies tied to the infrastructure—rent stabilization, right-to-return, property tax relief for long-time homeowners, and protections for renters. Otherwise ‘resilience’ becomes a pipeline to gentrification.",
+        "intent": "Decision Principles + Anti-Displacement شروط",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 15,
+        "speaker": "Student",
+        "text": "Let me summarize to check I’ve got this right: you’re not only asking for drainage reliability; you’re asking for governance that prioritizes vulnerability and pairs infrastructure with protections like right-to-return and renter safeguards—because otherwise upgrades can trigger displacement. Is that accurate? And what specific indicators—like flood frequency, pump downtime, health impacts, or housing cost burden—do you think the city should track publicly to hold itself accountable?",
+        "intent": "Reflective Summary + Technical Metrics Follow-up",
+        "iqr_markers": [
+          "reflective_summary_of_concerns",
+          "checking_for_understanding",
+          "specific_technical_followup",
+          "formal_stem_persona_maintenance",
+          "open_ended_question"
+        ]
+      },
+      {
+        "turn_id": 16,
+        "speaker": "Alex Rivera",
+        "text": "Yes, that’s accurate. Track flood calls by block, not averaged across the whole city. Track pump failures and maintenance logs. Track mold complaints and asthma ER visits—people get sick after these floods. And track rent increases after publicly funded repairs. If the city can’t handle that transparency, it tells you what the goal really is.",
+        "intent": "Accountability Metrics",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 17,
+        "speaker": "Student",
+        "text": "That’s really helpful, and I appreciate how concrete those metrics are. Before we wrap up, what do you want decision-makers—or technical teams designing these systems—to understand about the Inland Sector that they often miss when they look at maps, models, or cost–benefit tables?",
+        "intent": "Closing Probe + Perspective",
+        "iqr_markers": [
+          "verbal_acknowledgment",
+          "open_ended_question",
+          "perspective_taking_statement",
+          "neutral_framing",
+          "adaptive_conversational_pacing"
+        ]
+      },
+      {
+        "turn_id": 18,
+        "speaker": "Alex Rivera",
+        "text": "They miss that the Inland Sector is a community, not a line item. People have history here—mutual aid networks, churches, small businesses, kids who walk to school. If you build something that ‘solves flooding’ but breaks those ties, you didn’t solve the problem. You just moved it somewhere else and called it success.",
+        "intent": "Closing Values Statement",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 19,
+        "speaker": "Student",
+        "text": "I’m grateful you shared that. It sounds like the core message is: flood protection has to protect community continuity, not just property. I’ll write up my notes emphasizing the project examples you named—Marlin Avenue pipe capacity, the underpass pump station reliability, and school-adjacent green infrastructure—alongside the anti-displacement safeguards and the public metrics you recommended. Is there anything I misunderstood or should correct? And is there anything you’d like kept off the record or anonymized more strongly in how I present this?",
+        "intent": "Closure + Consent + Understanding Check",
+        "iqr_markers": [
+          "reflective_summary_of_concerns",
+          "checking_for_understanding",
+          "respectful_professional_tone",
+          "adherence_to_bias_safeguards",
+          "open_ended_question",
+          "transparency_about_interview_purpose"
+        ]
+      },
+      {
+        "turn_id": 20,
+        "speaker": "Alex Rivera",
+        "text": "That summary is solid. If you can, don’t name specific tenants or addresses—keep it at street level like you did. And make sure you don’t frame us as ‘anti–sea wall’ just because we want the city to stop ignoring inland needs. We’re pro-safety. We’re pro-staying.",
+        "intent": "Final Clarifications + Framing Request",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 21,
+        "speaker": "Student",
+        "text": "Absolutely—I’ll avoid identifying details and I’ll be careful not to mischaracterize your position. Thank you again, Alex. If you’re open to it, I may follow up with a short list of clarifying questions after I synthesize themes—only if needed and only with your consent. For now, I really appreciate your time and what you shared today.",
+        "intent": "Professional Closing",
+        "iqr_markers": [
+          "respectful_professional_tone",
+          "adaptive_conversational_pacing",
+          "transparency_about_interview_purpose",
+          "neutral_framing"
+        ]
+      },
+      {
+        "turn_id": 22,
+        "speaker": "Alex Rivera",
+        "text": "That’s fine. Just make sure it doesn’t disappear into another report that no one reads. People here are tired, but they’re paying attention.",
+        "intent": "Closing Sentiment",
+        "iqr_markers": []
+      }
+    ]
+  }

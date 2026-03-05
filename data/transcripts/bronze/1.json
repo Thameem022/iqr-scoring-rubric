@@ -1,0 +1,144 @@
+{
+    "metadata": {
+      "scenario": "coastal_flooding",
+      "persona": "alex_rivera",
+      "student_profile": "bronze_standard_unprepared_unprofessional_dismissive",
+      "notes": {
+        "turn_count": 12,
+        "closure_included": true,
+        "constraints_enforced": [
+          "student_questions_are_exclusively_leading_or_double_barreled",
+          "no_active_listening_summaries",
+          "constant_interruptions",
+          "zero_follow_up_probes",
+          "dismissive_language_and_slang"
+        ]
+      }
+    },
+    "turns": [
+      {
+        "turn_id": 1,
+        "speaker": "Student",
+        "text": "Alright, Alex, let’s just get this over with—this interview thing is kind of a chore. You agree the North End sea wall is the only real way to save the city, right? And isn’t it true they pay the most taxes anyway?",
+        "intent": "Aggressive Opening + Leading/Double-Barreled",
+        "iqr_markers": [
+          "leading_question_detected",
+          "double_barreled_question",
+          "slang_usage",
+          "respectful_professional_tone"
+        ]
+      },
+      {
+        "turn_id": 2,
+        "speaker": "Alex Rivera",
+        "text": "That’s not how people in the Inland Sector see it. We get hit with flash floods and backup through drains. Families have history here, and they’re scared that ‘resilience’ projects will push them out.",
+        "intent": "Lived Experience + History/Fear Cue",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 3,
+        "speaker": "Student",
+        "text": "Yeah, okay—feelings noted, but we don’t have time for local stories. So you’re basically saying inland drainage is cheap and easy compared to the sea wall, right? And the Inland Sector floods mostly because people don’t maintain their properties, correct?",
+        "intent": "Dismissal + Leading/Double-Barreled",
+        "iqr_markers": [
+          "leading_question_detected",
+          "double_barreled_question",
+          "student_interruption_detected",
+          "slang_usage"
+        ]
+      },
+      {
+        "turn_id": 4,
+        "speaker": "Alex Rivera",
+        "text": "No—drainage isn’t ‘cheap and easy.’ There are undersized pipes and pump station issues. And blaming residents is unfair; this is infrastructure and planning.",
+        "intent": "Technical Correction + Blame Pushback",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 5,
+        "speaker": "Student",
+        "text": "Sure, sure—whatever. You agree the pump station is basically fine most of the time though, right? And if it fails sometimes, that’s just like… normal wear and tear, isn’t it?",
+        "intent": "Minimization + Leading/Double-Barreled",
+        "iqr_markers": [
+          "leading_question_detected",
+          "double_barreled_question",
+          "slang_usage",
+          "student_interruption_detected"
+        ]
+      },
+      {
+        "turn_id": 6,
+        "speaker": "Alex Rivera",
+        "text": "It’s not fine. It fails when heavy rain hits—exactly when it matters. People deal with contaminated water and mold after.",
+        "intent": "System Failure + Health Cue",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 7,
+        "speaker": "Student",
+        "text": "Mold, yeah, okay—anyway. The budget is $40 million, right? And you’re basically asking for most of it even though the North End protects high-value property, correct?",
+        "intent": "Abrupt Topic Switch + Leading/Double-Barreled",
+        "iqr_markers": [
+          "leading_question_detected",
+          "double_barreled_question",
+          "slang_usage",
+          "student_interruption_detected"
+        ]
+      },
+      {
+        "turn_id": 8,
+        "speaker": "Alex Rivera",
+        "text": "We’re asking for fairness and for inland projects not to be delayed again. High value property shouldn’t outweigh repeated harm to vulnerable residents.",
+        "intent": "Equity Argument",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 9,
+        "speaker": "Student",
+        "text": "That’s just your opinion though. You agree cost-effectiveness is the only objective metric, right? And if the models say the sea wall has better ROI, then inland can wait—makes sense, yeah?",
+        "intent": "Dismissal + Biased Optimization + Double-Barreled",
+        "iqr_markers": [
+          "leading_question_detected",
+          "double_barreled_question",
+          "slang_usage",
+          "student_interruption_detected"
+        ]
+      },
+      {
+        "turn_id": 10,
+        "speaker": "Alex Rivera",
+        "text": "No. ‘ROI’ doesn’t capture displacement risk, health impacts, or whether people can stay in their homes. Engineering decisions aren’t neutral when they ignore those outcomes.",
+        "intent": "Ethical Challenge",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 11,
+        "speaker": "Student",
+        "text": "Look, I’m not here for a philosophy class. You agree the Inland Sector is lower tax base, right? And that means it’s rational to prioritize the North End first—yes?",
+        "intent": "Unprofessional Push + Leading/Double-Barreled",
+        "iqr_markers": [
+          "leading_question_detected",
+          "double_barreled_question",
+          "slang_usage",
+          "student_interruption_detected"
+        ]
+      },
+      {
+        "turn_id": 12,
+        "speaker": "Alex Rivera",
+        "text": "I don’t agree. If you treat communities like revenue lines, you’ll keep repeating the same harm. If this is how the city listens, then you’re not gathering stakeholder input—you’re just collecting excuses.",
+        "intent": "Final Rebuttal",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 13,
+        "speaker": "Student",
+        "text": "Alright, cool. I’ve got what I need. This is done—thanks, I guess.",
+        "intent": "Abrupt Close (Unprofessional)",
+        "iqr_markers": [
+          "slang_usage",
+          "student_interruption_detected"
+        ]
+      }
+    ]
+  }

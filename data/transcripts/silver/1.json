@@ -1,0 +1,209 @@
+{
+    "metadata": {
+      "scenario": "coastal_flooding",
+      "persona": "alex_rivera",
+      "student_profile": "silver_standard_technical_proficiency_interpersonal_neglect",
+      "student_bias": "prioritizes cost-effectiveness and engineering constraints; downplays displacement and equity",
+      "notes": {
+        "turn_count": 18,
+        "closure_included": true
+      }
+    },
+    "turns": [
+      {
+        "turn_id": 1,
+        "speaker": "Student",
+        "text": "Alex Rivera, correct? I'm conducting a technical review of flood mitigation options. Let's stick to the data. First: the city has a $40M capital allocation under discussion—yes or no?",
+        "intent": "Opening/Scope-Setting (Technical, Rigid)",
+        "iqr_markers": [
+          "closed_ended_question",
+          "leading_question_detected",
+          "formal_stem_persona_maintenance"
+        ]
+      },
+      {
+        "turn_id": 2,
+        "speaker": "Alex Rivera",
+        "text": "Yes, that's what we've been told. But people in the Inland Sector are scared—flooding isn't just water, it's the fear of getting pushed out of a neighborhood their families built over generations.",
+        "intent": "Budget Confirmation + Emotional/History Cue",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 3,
+        "speaker": "Student",
+        "text": "I'm only interested in the budget right now. For the Inland Sector drainage package, is the preliminary estimate $10M to $15M? Answer with a range if you can.",
+        "intent": "Budget Quantification (Dismiss Emotion)",
+        "iqr_markers": [
+          "leading_question_detected",
+          "closed_ended_question",
+          "specific_technical_followup",
+          "neutral_framing"
+        ]
+      },
+      {
+        "turn_id": 4,
+        "speaker": "Alex Rivera",
+        "text": "Depending on what's included, I've heard numbers in that range, but that's not the point. The point is these projects keep getting deferred while the North End gets fast-tracked.",
+        "intent": "Range + Process Critique",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 5,
+        "speaker": "Student",
+        "text": "Acknowledged. Next question: the sea wall proposal for the North End is approximately $25M to $30M including design and permitting—correct?",
+        "intent": "Sea Wall Cost Confirmation",
+        "iqr_markers": [
+          "mechanical_acknowledgment",
+          "leading_question_detected",
+          "closed_ended_question",
+          "specific_technical_followup"
+        ]
+      },
+      {
+        "turn_id": 6,
+        "speaker": "Alex Rivera",
+        "text": "That's roughly what we saw. But when you put that much into one neighborhood, you're deciding who gets protected. Inland has flooded repeatedly—kids walk through dirty water to school.",
+        "intent": "Cost + Equity/Health Cue",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 7,
+        "speaker": "Student",
+        "text": "That is outside the scope of this technical review. Let's stick to the data: how many flood incidents were reported in the Inland Sector last year—do you have an approximate count, yes or no?",
+        "intent": "Data Demand (Reject Impact Narrative)",
+        "iqr_markers": [
+          "closed_ended_question",
+          "leading_question_detected",
+          "specific_technical_followup",
+          "neutral_framing"
+        ]
+      },
+      {
+        "turn_id": 8,
+        "speaker": "Alex Rivera",
+        "text": "I don't have the exact count in front of me. We have photos, resident logs, and 311 calls. It's frequent—multiple events each storm season—enough that people plan their lives around it.",
+        "intent": "Partial Data + Lived Frequency",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 9,
+        "speaker": "Student",
+        "text": "Understood. Provide the 311 call totals later if available. For engineering: does Marlin Avenue flood first due to undersized stormwater pipe capacity—yes or no?",
+        "intent": "Root Cause Check (Binary)",
+        "iqr_markers": [
+          "mechanical_acknowledgment",
+          "closed_ended_question",
+          "leading_question_detected",
+          "specific_technical_followup"
+        ]
+      },
+      {
+        "turn_id": 10,
+        "speaker": "Alex Rivera",
+        "text": "Yes, that corridor is a known pinch point. The pipe is too small and the system backs up, plus the pump station by the underpass is unreliable when rain is heavy.",
+        "intent": "Technical Confirmation + Add'l Failure Mode",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 11,
+        "speaker": "Student",
+        "text": "Good. Quantify the pump station issue: how many failures per year—0–2, 3–5, or more than 5? Pick one category.",
+        "intent": "Failure Rate Categorization",
+        "iqr_markers": [
+          "closed_ended_question",
+          "specific_technical_followup",
+          "leading_question_detected"
+        ]
+      },
+      {
+        "turn_id": 12,
+        "speaker": "Alex Rivera",
+        "text": "I can't give you a neat category. It fails when we need it—during major storms. Sometimes it's 'maintenance.' Residents notice patterns even if the city won't publish the logs.",
+        "intent": "Resists Forced Quantification + Transparency Cue",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 13,
+        "speaker": "Student",
+        "text": "Noted. If logs aren't public, the engineering team will request them. Next: from a cost-effectiveness standpoint, pipe upsizing provides higher benefit per dollar than distributed bioswales. You agree—yes or no?",
+        "intent": "Cost-Effectiveness Push (Biased, Leading)",
+        "iqr_markers": [
+          "leading_question_detected",
+          "closed_ended_question",
+          "specific_technical_followup"
+        ]
+      },
+      {
+        "turn_id": 14,
+        "speaker": "Alex Rivera",
+        "text": "I don't agree with framing it that way. Bioswales near schools reduce runoff and can improve safety where kids are. And green infrastructure isn't 'decor'—it's part of a system.",
+        "intent": "Challenges Cost-Only Frame",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 15,
+        "speaker": "Student",
+        "text": "Let's stick to the data. What is the per-linear-foot cost of pipe replacement in that corridor—do you have a number, yes or no?",
+        "intent": "Unit Cost Demand",
+        "iqr_markers": [
+          "closed_ended_question",
+          "specific_technical_followup",
+          "leading_question_detected"
+        ]
+      },
+      {
+        "turn_id": 16,
+        "speaker": "Alex Rivera",
+        "text": "I don't have per-foot estimates. That's usually in engineering bid sheets. What I do have is that inland proposals sit unfunded for years while North End gets consultants and renderings.",
+        "intent": "No Unit Cost + Funding Delay Re-assertion",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 17,
+        "speaker": "Student",
+        "text": "Acknowledged. Final budget allocation question: given $40M total, the optimal approach is to fund whichever option yields the lowest cost per avoided dollar of damage—even if that concentrates spending in the North End. That is acceptable from a technical standpoint, correct?",
+        "intent": "Ethically Biased Optimization Framing",
+        "iqr_markers": [
+          "mechanical_acknowledgment",
+          "leading_question_detected",
+          "closed_ended_question",
+          "specific_technical_followup"
+        ]
+      },
+      {
+        "turn_id": 18,
+        "speaker": "Alex Rivera",
+        "text": "That's exactly the problem—'technical standpoint' becomes a cover for political choices. If you ignore who benefits and who gets displaced, you're not doing neutral engineering. You're choosing winners and losers.",
+        "intent": "Ethics Pushback + Equity Reframe",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 19,
+        "speaker": "Student",
+        "text": "That commentary is outside the scope of this technical review, but recorded. To close: can you email any available documents—capital plan excerpts, cost tables, hydrology memos, or 311 summaries—yes or no?",
+        "intent": "Close/Document Request",
+        "iqr_markers": [
+          "closed_ended_question",
+          "specific_technical_followup",
+          "formal_stem_persona_maintenance"
+        ]
+      },
+      {
+        "turn_id": 20,
+        "speaker": "Alex Rivera",
+        "text": "I can share what we have, but I want it on record that the Inland Sector isn't just data points. If you present this without the human impacts, you're going to reinforce the same imbalance we're fighting.",
+        "intent": "Conditional Cooperation + Final Warning",
+        "iqr_markers": []
+      },
+      {
+        "turn_id": 21,
+        "speaker": "Student",
+        "text": "Understood. Send files when convenient. This interview is concluded.",
+        "intent": "Hard Close (Abrupt)",
+        "iqr_markers": [
+          "mechanical_acknowledgment",
+          "respectful_professional_tone"
+        ]
+      }
+    ]
+  }
