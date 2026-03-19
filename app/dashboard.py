@@ -47,6 +47,18 @@ def relative_path_to_evaluation_basename(relative_path: str) -> str:
     return f"gpt4o_{level}_{stem}_results.json"
 
 
+def pretty_transcript_label(relative_path: str) -> str:
+    """
+    Human-friendly label for sidebar selector.
+    Example: 'bronze/1.json' -> 'Bronze · Interview 1'.
+    """
+    path = Path(relative_path)
+    level = path.parent.name or path.stem
+    stem = path.stem
+    # Capitalize level and keep interview id as-is so it works for non-numeric stems too.
+    return f"{level.capitalize()} · Interview {stem}"
+
+
 def load_json(path: Path) -> Dict[str, Any] | None:
     if not path.is_file():
         return None
@@ -121,7 +133,89 @@ def inject_light_theme_css() -> None:
         [data-testid="stSidebar"] h1 { color: #1e40af !important; font-weight: 700 !important; }
         [data-testid="stSidebar"] .stMarkdown { color: #334155 !important; }
         [data-testid="stSidebar"] label { color: #1e293b !important; font-weight: 500 !important; }
-        /* Expanders: white content, dark text */
+        /* Sidebar selectbox: cleaner, pill-like selector */
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] > div {
+          border-radius: 999px !important;
+          border: 1px solid #cbd5f5 !important;
+          background: #0f172a !important;
+          box-shadow: 0 4px 12px rgba(15,23,42,0.35) !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] [data-baseweb="select"] {
+          border-radius: 999px !important;
+          background: transparent !important;
+        }
+        /* Prevent visible typing in selector input (keep it click-only) */
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] input {
+          caret-color: transparent !important;
+          user-select: none !important;
+          -webkit-user-select: none !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] input::placeholder {
+          color: #e5e7eb !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] svg {
+          color: #e5e7eb !important;
+        }
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] div[role="button"],
+        [data-testid="stSidebar"] [data-testid="stSelectbox"] span {
+          color: #f9fafb !important;
+          font-weight: 600 !important;
+          font-size: 0.9rem !important;
+        }
+        /* Expanders: light header so dark text is always visible (override Streamlit dark header) */
+        [data-testid="stExpander"] {
+          background: #ffffff !important;
+          border: 1px solid #e5e7eb !important;
+          border-radius: 8px !important;
+          margin-bottom: 0.5rem !important;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+        }
+        /* Streamlit expander header: force light background + dark text (no dark bar) */
+        .streamlit-expanderHeader,
+        .streamlit-expanderHeader span,
+        .streamlit-expanderHeader p,
+        .streamlit-expanderHeader label,
+        [data-testid="stExpander"] > summary,
+        [data-testid="stExpander"] > div:first-child,
+        [data-testid="stExpander"] [role="button"],
+        [data-testid="stExpander"] label,
+        [data-testid="stExpander"] button {
+          background: #ffffff !important;
+          background-color: #ffffff !important;
+          color: #1e293b !important;
+          font-weight: 600 !important;
+        }
+        [data-testid="stExpander"] summary p,
+        [data-testid="stExpander"] label p,
+        [data-testid="stExpander"] > div:first-child p,
+        [data-testid="stExpander"] > div:first-child span,
+        [data-testid="stExpander"] summary span,
+        [data-testid="stExpander"] label span,
+        [data-testid="stExpander"] button p,
+        [data-testid="stExpander"] button span {
+          color: #1e293b !important;
+          font-weight: 600 !important;
+          background: transparent !important;
+        }
+        [data-testid="stExpander"] > div:first-child,
+        [data-testid="stExpander"] > div:first-child * {
+          color: #1e293b !important;
+        }
+        [data-testid="stExpander"] > div:first-child * {
+          background: transparent !important;
+        }
+        [data-testid="stExpander"] > div:first-child *:hover,
+        [data-testid="stExpander"] > div:first-child *:focus {
+          color: #1e293b !important;
+          background: #f8fafc !important;
+        }
+        .streamlit-expanderHeader:hover,
+        .streamlit-expanderHeader:focus,
+        .streamlit-expanderHeader:focus-within {
+          background: #f8fafc !important;
+          background-color: #f8fafc !important;
+          color: #1e293b !important;
+        }
         .streamlit-expanderContent { background: #ffffff !important; color: #1e293b !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important; }
         </style>
         """,
@@ -159,6 +253,7 @@ def main() -> None:
         index=0,
         help="List is built from data/transcripts/.",
         label_visibility="collapsed",
+        format_func=pretty_transcript_label,
     )
     st.sidebar.markdown(
         "<p style='color: #1e293b; font-size: 0.8rem; margin-top: 1rem; font-weight: 600;'>Intel Trends</p>",
@@ -274,7 +369,19 @@ def main() -> None:
         stakeholder_cue = evidence.get("stakeholder_cue", "")
         turn_id = evidence.get("turn_id", "")
 
-        with st.expander(f"**{dim_name}** — Score: {score} ({label})"):
+        # Always-visible header (white bg, dark text) so dimension title is readable without relying on expander styling
+        st.markdown(
+            f"""
+            <div style="
+                background: #ffffff; border: 1px solid #e5e7eb; border-bottom: none;
+                border-radius: 8px 8px 0 0; padding: 0.65rem 1rem;
+                margin-top: 0.75rem; margin-bottom: 0;
+                color: #1e293b; font-weight: 600; font-size: 1rem;
+            ">{html.escape(dim_name)} — Score: {score} ({html.escape(label)})</div>
+            """,
+            unsafe_allow_html=True,
+        )
+        with st.expander("▼ Rationale & evidence", expanded=False):
             st.markdown(
                 "<div style='background:#fff; color:#1e293b; padding:0.5rem 0;'>"
                 "<strong style='color:#1e293b;'>Rationale</strong></div>",
@@ -313,21 +420,26 @@ def main() -> None:
                 unsafe_allow_html=True,
             )
 
-    st.subheader("Transcript viewer")
-    show_transcript = st.checkbox("Show full raw dialogue", value=False)
-    if show_transcript:
-        turns = transcript_data.get("turns") or []
-        parts = [
-            "<div style='background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1.25rem; margin-top:0.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.06);'>"
-        ]
-        for t in turns:
-            tid = t.get("turn_id", "")
-            speaker = html.escape(str(t.get("speaker", "?")))
-            text = html.escape(str(t.get("text", ""))).replace("\n", "<br/>")
-            parts.append(f"<p style='color:#1e293b; font-weight:600; margin:0.75rem 0 0.25rem 0;'>Turn {tid} — {speaker}</p>")
-            parts.append(f"<p style='color:#334155; margin-left:1rem; line-height:1.5;'>{text}</p>")
-        parts.append("</div>")
-        st.markdown("".join(parts), unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown(
+        """
+        <h3 style="color:#1e293b; font-weight:600; margin:0.75rem 0 0.25rem 0;">Conversation transcript</h3>
+        <p style="color:#64748b; font-size:0.9rem; margin:0 0 0.5rem 0;">Full dialogue from the selected interview.</p>
+        """,
+        unsafe_allow_html=True,
+    )
+    turns = transcript_data.get("turns") or []
+    parts = [
+        "<div style='background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1.25rem; margin-top:0.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.06);'>"
+    ]
+    for t in turns:
+        tid = t.get("turn_id", "")
+        speaker = html.escape(str(t.get("speaker", "?")))
+        text = html.escape(str(t.get("text", ""))).replace("\n", "<br/>")
+        parts.append(f"<p style='color:#1e293b; font-weight:600; margin:0.75rem 0 0.25rem 0;'>Turn {tid} — {speaker}</p>")
+        parts.append(f"<p style='color:#334155; margin-left:1rem; line-height:1.5;'>{text}</p>")
+    parts.append("</div>")
+    st.markdown("".join(parts), unsafe_allow_html=True)
 
     st.sidebar.markdown("---")
     st.sidebar.caption("Intervista IQR · Academic Dashboard")
