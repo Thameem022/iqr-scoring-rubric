@@ -62,7 +62,8 @@ class Evidence(BaseModel):
 
     This links an IQR/SIC decision back to specific transcript
     content, including the turn where the behavior occurred, a
-    salient student quote, and the stakeholder's cue or context.
+    salient student quote, the stakeholder's cue or context, and
+    optional verbatim phrasing feedback for a stronger question.
     """
 
     turn_id: int = Field(..., description="Turn identifier where key evidence was observed.")
@@ -73,6 +74,13 @@ class Evidence(BaseModel):
     stakeholder_cue: str = Field(
         ...,
         description="Relevant stakeholder statement, reaction, or contextual cue.",
+    )
+    alternative_phrasing: Optional[str] = Field(
+        default=None,
+        description=(
+            "Verbatim suggestion for a clearer or stronger interview question. "
+            "Displayed beside the student quote as 'A better way to ask' in the dashboard."
+        ),
     )
 
     @field_validator("turn_id")
@@ -91,9 +99,10 @@ class IQREvaluation(BaseModel):
     Encodes the score for a single IQR or SIC rubric dimension.
 
     Each instance represents one dimension (e.g., empathy, technical
-    accuracy, stakeholder coverage) with a 7-point score, a label, a
-    free-text rationale, and structured evidence referencing the
-    underlying transcript.
+    accuracy, stakeholder coverage) with a 10-point score (including
+    half steps), a skill-level title, a label, a free-text rationale,
+    optional line-of-inquiry impact, and structured evidence referencing
+    the underlying transcript.
     """
 
     dimension_id: str = Field(
@@ -104,9 +113,16 @@ class IQREvaluation(BaseModel):
         ...,
         description="Human-readable name of the rubric dimension.",
     )
-    score: int = Field(
+    score: float = Field(
         ...,
-        description="Ordinal 7-point rubric score (1–7).",
+        description="Rubric score on a 10-point scale (e.g., 6.5 for 6.5/10).",
+    )
+    skill_level_title: str = Field(
+        ...,
+        description=(
+            "Descriptive skill indicator (e.g., 'Competent Operational Interviewer'). "
+            "Shown on the diagnostic dashboard per dimension and aggregated in the session badge."
+        ),
     )
     label: str = Field(
         ...,
@@ -116,6 +132,14 @@ class IQREvaluation(BaseModel):
         ...,
         description="Natural language explanation justifying the assigned score.",
     )
+    line_of_inquiry_impact: Optional[str] = Field(
+        default=None,
+        description=(
+            "Type of insight (technical, ethical, contextual, etc.) that was "
+            "inaccessible due to the student's phrasing. Surfaced in the dashboard "
+            "as an amber 'insight loss' callout when present."
+        ),
+    )
     evidence: Evidence = Field(
         ...,
         description="Structured evidence pointing back to the source transcript turns.",
@@ -123,12 +147,12 @@ class IQREvaluation(BaseModel):
 
     @field_validator("score")
     @classmethod
-    def validate_score_range(cls, value: int) -> int:
+    def validate_score_range(cls, value: float) -> float:
         """
-        Ensure that rubric scores respect the 7-point scale.
+        Ensure that rubric scores respect the 10-point scale.
         """
-        if not (1 <= value <= 7):
-            raise ValueError("score must be between 1 and 7 (inclusive).")
+        if not (1.0 <= value <= 10.0):
+            raise ValueError("score must be between 1.0 and 10.0 (inclusive).")
         return value
 
 
@@ -144,7 +168,11 @@ class SessionEvaluation(BaseModel):
 
     metadata: Dict[str, Any] = Field(
         default_factory=dict,
-        description="Session-level metadata mirrored from the input transcript or analytics context.",
+        description=(
+            "Session-level metadata: input transcript fields plus evaluator-enriched "
+            "keys such as iqr_score_scale, iqr_score_min, iqr_score_max, "
+            "iqr_skill_bands for the 10-point diagnostic scale."
+        ),
     )
     evaluation_results: List[IQREvaluation] = Field(
         default_factory=list,

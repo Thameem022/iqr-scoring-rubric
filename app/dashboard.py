@@ -1,12 +1,13 @@
 """
-Intervista Scoring Dashboard — visualize IQR results for stakeholders.
+Intervista Scoring Dashboard — Diagnostic Coach UI for IQR results.
 
 Run from project root: streamlit run app/dashboard.py
 """
 from __future__ import annotations
 
-import json
 import html
+import json
+from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -24,6 +25,13 @@ DIMENSION_ORDER = [
     "Active Listening",
     "Rapport-Building",
     "Ethical Conduct",
+]
+
+# Default tactical actions when JSON omits next_interview_actions
+DEFAULT_NEXT_ACTIONS = [
+    "Ask at least 2 open-ended questions per topic.",
+    "Follow up once on every stakeholder concern.",
+    "Avoid interrupting stakeholder responses.",
 ]
 
 
@@ -55,7 +63,6 @@ def pretty_transcript_label(relative_path: str) -> str:
     path = Path(relative_path)
     level = path.parent.name or path.stem
     stem = path.stem
-    # Capitalize level and keep interview id as-is so it works for non-numeric stems too.
     return f"{level.capitalize()} · Interview {stem}"
 
 
@@ -66,21 +73,162 @@ def load_json(path: Path) -> Dict[str, Any] | None:
         return json.load(f)
 
 
-# Score-based theming: (soft_border_color, deep_score_text_color, band_label)
-SCORE_1_2 = ("#fee2e2", "#991b1b", "Needs Improvement")   # Soft Red border, Deep Red text
-SCORE_3_4 = ("#fef3c7", "#92400e", "Proficient")         # Soft Amber border, Deep Amber text
-SCORE_5_7 = ("#d1fae5", "#065f46", "Excellent")          # Soft Green border, Deep Green text
+# 10-point diagnostic band titles (aligned with IQR Phase 1 / schema skill_level_title)
+def skill_title_from_mean(score: float) -> str:
+    """Map a numeric mean to the canonical skill band title for session-level display."""
+    if score >= 10.0:
+        return "Master Stakeholder Partner"
+    if score >= 9.0:
+        return "Advanced Systems Interviewer"
+    if score >= 8.0:
+        return "Competent Operational Interviewer"
+    if score >= 7.0:
+        return "Emerging Technical Interviewer"
+    if score >= 6.0:
+        return "Novice Fact-Finder"
+    return "Developing interviewer"
 
 
-def score_theme(score: int) -> tuple[str, str, str]:
-    if score <= 2:
-        return SCORE_1_2
-    if score <= 4:
-        return SCORE_3_4
-    return SCORE_5_7
+def _use_legacy_7point_scale(meta: Dict[str, Any], results: List[Dict[str, Any]]) -> bool:
+    """True when JSON looks like pre–10-point IQR (integer 1–7, no diagnostic fields)."""
+    if meta.get("iqr_score_scale") == "10-point" or meta.get("iqr_score_max") == 10.0:
+        return False
+    if any((r.get("skill_level_title") or "").strip() for r in results):
+        return False
+    return True
 
 
-# Icons for dimension cards (WPI-academic professional)
+def parse_dimension_score(
+    raw: Any,
+    meta: Dict[str, Any] | None = None,
+    results: List[Dict[str, Any]] | None = None,
+) -> float:
+    """Coerce JSON score to float on the 10-point scale for display."""
+    try:
+        v = float(raw)
+    except (TypeError, ValueError):
+        return 0.0
+    meta = meta or {}
+    results = results or []
+    if _use_legacy_7point_scale(meta, results) and v == int(v) and 1 <= v <= 7:
+        return round((v / 7.0) * 10.0, 1)
+    return v
+
+
+def session_skill_badge_parts(
+    results: List[Dict[str, Any]], meta: Dict[str, Any] | None = None
+) -> tuple[float, str]:
+    """
+    Build session-level headline: mean score and a representative skill_level_title
+    (mode across dimensions, else derived from mean).
+    """
+    if not results:
+        return 0.0, "—"
+    scores = [parse_dimension_score(r.get("score"), meta, results) for r in results]
+    mean_score = sum(scores) / len(scores)
+    titles = [str(r.get("skill_level_title") or "").strip() for r in results]
+    titles = [t for t in titles if t]
+    if titles:
+        mode_title = Counter(titles).most_common(1)[0][0]
+        return round(mean_score, 1), mode_title
+    return round(mean_score, 1), skill_title_from_mean(mean_score)
+
+
+def coach_accent_colors(mean_score: float) -> Dict[str, str]:
+    """Amber-forward for developing / novice; green-forward for advanced."""
+    if mean_score >= 8.0:
+        return {
+            "header_bg": "linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 50%, #ffffff 100%)",
+            "header_border": "#059669",
+            "header_accent": "#047857",
+            "badge_soft": "#d1fae5",
+        }
+    return {
+        "header_bg": "linear-gradient(135deg, #fffbeb 0%, #fff7ed 50%, #ffffff 100%)",
+        "header_border": "#d97706",
+        "header_accent": "#b45309",
+        "badge_soft": "#fef3c7",
+    }
+
+
+def missed_insight_text(res: Dict[str, Any]) -> str:
+    """
+    Plain text only (no HTML): what was lost — prefer line_of_inquiry_impact, else rationale.
+    Escape before embedding in templates via escape_html_multiline().
+    """
+    li = res.get("line_of_inquiry_impact")
+    if li is not None and str(li).strip():
+        return str(li).strip()
+    rat = (res.get("rationale") or "").strip()
+    return rat if rat else "—"
+
+
+def escape_html_multiline(plain: str) -> str:
+    """Escape user/content for safe HTML; preserve line breaks as <br/>."""
+    return html.escape(plain).replace("\n", "<br/>")
+
+
+def dimension_insight_card_html(
+    stakeholder_content_html: str,
+    missed_insight_content_html: str,
+    show_missed_insight: bool,
+) -> str:
+    """
+    Full HTML for stakeholder cue and optional Missed insight.
+    Pass only pre-escaped fragments (from escape_html_multiline); this function
+    does not wrap content in code fences or <pre>.
+    """
+    missed_html = ""
+    if show_missed_insight:
+        missed_html = (
+            '<div style="font-weight:700;color:#b45309;font-size:0.78rem;margin-bottom:0.35rem;">Missed insight</div>'
+            f'<div style="color:#292524;line-height:1.55;font-size:0.95rem;">{missed_insight_content_html}</div>'
+        )
+
+    return (
+        '<div style="background:#fafaf9;border:1px solid #e7e5e4;border-top:1px dashed #d6d3d1;'
+        'border-radius:0 0 12px 12px;padding:1rem 1.15rem 1.15rem 1.15rem;margin-bottom:0.5rem;">'
+        '<div style="font-weight:700;color:#57534e;font-size:0.78rem;margin-bottom:0.4rem;">Stakeholder cue</div>'
+        f'<div style="color:#44403c;line-height:1.55;font-size:0.92rem;margin-bottom:1rem;">{stakeholder_content_html}</div>'
+        f"{missed_html}"
+        "</div>"
+    )
+
+
+def parse_next_interview_actions(evaluation_data: Dict[str, Any]) -> List[str]:
+    """Normalize next_interview_actions from JSON (list, newline string, or defaults)."""
+    raw = evaluation_data.get("next_interview_actions")
+    if isinstance(raw, list):
+        out = [str(x).strip() for x in raw if str(x).strip()]
+        return out if out else list(DEFAULT_NEXT_ACTIONS)
+    if isinstance(raw, str) and raw.strip():
+        lines = [ln.strip().lstrip("•").lstrip("-").strip() for ln in raw.splitlines()]
+        lines = [ln for ln in lines if ln]
+        return lines if lines else list(DEFAULT_NEXT_ACTIONS)
+    return list(DEFAULT_NEXT_ACTIONS)
+
+
+def tactical_game_plan_three(evaluation_data: Dict[str, Any]) -> List[str]:
+    """Exactly three bullets: JSON order first, then pad from DEFAULT_NEXT_ACTIONS."""
+    base = parse_next_interview_actions(evaluation_data)
+    out: List[str] = []
+    seen: set[str] = set()
+    for item in base:
+        if len(out) >= 3:
+            break
+        if item not in seen:
+            seen.add(item)
+            out.append(item)
+    for d in DEFAULT_NEXT_ACTIONS:
+        if len(out) >= 3:
+            break
+        if d not in seen:
+            seen.add(d)
+            out.append(d)
+    return out[:3]
+
+
+# Icons for dimension sections
 DIMENSION_ICONS = {
     "Question Formulation": "📋",
     "Probing Quality": "🔍",
@@ -90,133 +238,62 @@ DIMENSION_ICONS = {
 }
 
 
-def render_metric_card(label: str, score: int) -> None:
-    border_color, score_color, band_label = score_theme(score)
-    icon = DIMENSION_ICONS.get(label, "•")
-    label_esc = html.escape(label)
-    band_esc = html.escape(band_label)
-    st.markdown(
-        f"""
-        <div class="metric-card" style="
-            background: #ffffff;
-            border: 2px solid {border_color};
-            border-radius: 10px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        ">
-            <div style="font-size: 0.85rem; font-weight: 600; color: #1e293b; margin-bottom: 0.35rem;">{icon} {label_esc}</div>
-            <div style="font-size: 2.25rem; font-weight: 800; color: {score_color}; line-height: 1.2;">{score}</div>
-            <div style="font-size: 0.8rem; font-weight: 600; color: #1e293b;">{band_esc}</div>
-            <div style="font-size: 0.7rem; color: #64748b;">/ 7</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def inject_light_theme_css() -> None:
-    """Inject WPI-academic professional light theme: off-white background, white blocks, deep charcoal text."""
+def inject_coach_theme_css() -> None:
+    """Diagnostic Coach theme: coach-oriented palette, quote styling, expanders."""
     st.markdown(
         """
         <style>
-        /* Overall theme: clean light background, sans-serif */
-        .stApp { background-color: #f8fafc !important; }
-        .stApp header { background: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important; }
+        .stApp { background-color: #fafaf9 !important; }
+        .stApp header { background: #ffffff !important; border-bottom: 1px solid #e7e5e4 !important; }
         main { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important; }
-        main .stMarkdown { color: #1e293b !important; }
-        main h1 { color: #0f172a !important; font-weight: 700 !important; }
-        main h2, main h3 { color: #1e293b !important; font-weight: 600 !important; }
-        main p, main li { color: #334155 !important; line-height: 1.6 !important; }
-        /* Sidebar: mid-gray, deep blue title, charcoal labels */
-        [data-testid="stSidebar"] { background: #f1f5f9 !important; border-right: 1px solid #e2e8f0 !important; }
-        [data-testid="stSidebar"] h1 { color: #1e40af !important; font-weight: 700 !important; }
-        [data-testid="stSidebar"] .stMarkdown { color: #334155 !important; }
-        [data-testid="stSidebar"] label { color: #1e293b !important; font-weight: 500 !important; }
-        /* Sidebar selectbox: cleaner, pill-like selector */
+        main .stMarkdown { color: #1c1917 !important; }
+        main h1 { color: #0c0a09 !important; font-weight: 700 !important; }
+        main h2, main h3 { color: #292524 !important; font-weight: 600 !important; }
+        [data-testid="stSidebar"] {
+          background: #f5f5f4 !important;
+          border-right: 1px solid #e7e5e4 !important;
+        }
+        [data-testid="stSidebar"] h1 { color: #b45309 !important; font-weight: 700 !important; }
         [data-testid="stSidebar"] [data-testid="stSelectbox"] > div {
           border-radius: 999px !important;
-          border: 1px solid #cbd5f5 !important;
-          background: #0f172a !important;
-          box-shadow: 0 4px 12px rgba(15,23,42,0.35) !important;
+          border: 1px solid #d6d3d1 !important;
+          background: #1c1917 !important;
+          box-shadow: 0 4px 12px rgba(28,25,23,0.25) !important;
         }
-        [data-testid="stSidebar"] [data-testid="stSelectbox"] [data-baseweb="select"] {
-          border-radius: 999px !important;
-          background: transparent !important;
-        }
-        /* Prevent visible typing in selector input (keep it click-only) */
         [data-testid="stSidebar"] [data-testid="stSelectbox"] input {
           caret-color: transparent !important;
           user-select: none !important;
-          -webkit-user-select: none !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stSelectbox"] input::placeholder {
-          color: #e5e7eb !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stSelectbox"] svg {
-          color: #e5e7eb !important;
         }
         [data-testid="stSidebar"] [data-testid="stSelectbox"] div[role="button"],
         [data-testid="stSidebar"] [data-testid="stSelectbox"] span {
-          color: #f9fafb !important;
+          color: #fafaf9 !important;
           font-weight: 600 !important;
-          font-size: 0.9rem !important;
         }
-        /* Expanders: light header so dark text is always visible (override Streamlit dark header) */
         [data-testid="stExpander"] {
           background: #ffffff !important;
-          border: 1px solid #e5e7eb !important;
+          border: 1px solid #e7e5e4 !important;
           border-radius: 8px !important;
           margin-bottom: 0.5rem !important;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
         }
-        /* Streamlit expander header: force light background + dark text (no dark bar) */
         .streamlit-expanderHeader,
-        .streamlit-expanderHeader span,
-        .streamlit-expanderHeader p,
-        .streamlit-expanderHeader label,
-        [data-testid="stExpander"] > summary,
-        [data-testid="stExpander"] > div:first-child,
-        [data-testid="stExpander"] [role="button"],
-        [data-testid="stExpander"] label,
-        [data-testid="stExpander"] button {
+        [data-testid="stExpander"] summary,
+        [data-testid="stExpander"] label {
           background: #ffffff !important;
-          background-color: #ffffff !important;
-          color: #1e293b !important;
+          color: #292524 !important;
           font-weight: 600 !important;
         }
-        [data-testid="stExpander"] summary p,
-        [data-testid="stExpander"] label p,
-        [data-testid="stExpander"] > div:first-child p,
-        [data-testid="stExpander"] > div:first-child span,
-        [data-testid="stExpander"] summary span,
-        [data-testid="stExpander"] label span,
-        [data-testid="stExpander"] button p,
-        [data-testid="stExpander"] button span {
-          color: #1e293b !important;
-          font-weight: 600 !important;
+        .streamlit-expanderContent {
+          background: #ffffff !important;
+          color: #292524 !important;
+          border: 1px solid #e7e5e4 !important;
+          border-radius: 8px !important;
+        }
+        /* Avoid Streamlit Markdown rendering indented HTML as <pre> / code blocks */
+        div[data-testid="stMarkdownContainer"] pre {
           background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
         }
-        [data-testid="stExpander"] > div:first-child,
-        [data-testid="stExpander"] > div:first-child * {
-          color: #1e293b !important;
-        }
-        [data-testid="stExpander"] > div:first-child * {
-          background: transparent !important;
-        }
-        [data-testid="stExpander"] > div:first-child *:hover,
-        [data-testid="stExpander"] > div:first-child *:focus {
-          color: #1e293b !important;
-          background: #f8fafc !important;
-        }
-        .streamlit-expanderHeader:hover,
-        .streamlit-expanderHeader:focus,
-        .streamlit-expanderHeader:focus-within {
-          background: #f8fafc !important;
-          background-color: #f8fafc !important;
-          color: #1e293b !important;
-        }
-        .streamlit-expanderContent { background: #ffffff !important; color: #1e293b !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -225,26 +302,28 @@ def inject_light_theme_css() -> None:
 
 def main() -> None:
     st.set_page_config(
-        page_title="Intervista IQR Dashboard",
-        page_icon="📊",
+        page_title="Diagnostic Coach — IQR",
+        page_icon="🎯",
         layout="wide",
         initial_sidebar_state="expanded",
     )
-    inject_light_theme_css()
+    inject_coach_theme_css()
 
-    # Sidebar: polished structure — deep blue title, charcoal labels (Phase 4.2)
     st.sidebar.markdown(
-        "<h1 style='color: #1e40af; font-weight: 700; margin-bottom: 0.5rem;'>Intervista Dashboard</h1>",
+        "<h1 style='color: #b45309; font-weight: 700; margin-bottom: 0.25rem;'>Diagnostic Coach</h1>",
         unsafe_allow_html=True,
     )
     st.sidebar.markdown(
-        "<p style='color: #1e293b; font-size: 0.85rem; font-weight: 600; margin-top: 0.5rem;'>Interview selector</p>",
+        "<p style='color: #44403c; font-size: 0.85rem; font-weight: 600;'>Interview selector</p>",
         unsafe_allow_html=True,
     )
     transcript_options = discover_transcripts()
     if not transcript_options:
         st.sidebar.warning("No transcripts found under `data/transcripts/`.")
-        st.error("**No interviews to display.** Add `.json` transcript files under `data/transcripts/` (e.g. `gold/1.json`, `bronze/2.json`).")
+        st.error(
+            "**No interviews to display.** Add `.json` transcript files under `data/transcripts/` "
+            "(e.g. `gold/1.json`, `bronze/2.json`)."
+        )
         return
 
     selected_relative = st.sidebar.selectbox(
@@ -255,12 +334,8 @@ def main() -> None:
         label_visibility="collapsed",
         format_func=pretty_transcript_label,
     )
-    st.sidebar.markdown(
-        "<p style='color: #1e293b; font-size: 0.8rem; margin-top: 1rem; font-weight: 600;'>Intel Trends</p>",
-        unsafe_allow_html=True,
-    )
-    st.sidebar.caption("Select an interview to view scoring and trends.")
-    # Map selection to paths: relative path -> transcript path, evaluation path
+    st.sidebar.caption("Select a session to view coaching feedback.")
+
     transcript_path = TRANSCRIPTS_DIR / selected_relative
     evaluation_basename = relative_path_to_evaluation_basename(selected_relative)
     evaluation_path = OUTPUT_DIR / evaluation_basename
@@ -281,15 +356,14 @@ def main() -> None:
             "`python tests/scripts/run_calibration.py --transcript data/transcripts/..."
             " --provider openai --model gpt-4o`"
         )
-        # Show transcript-only view when evaluation is missing (light theme)
         meta = transcript_data.get("metadata") or {}
         st.markdown(
             f"""
-            <div style="background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1.25rem; margin-bottom:1rem; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                <h3 style="color:#1e293b;">Session metadata (transcript only)</h3>
-                <p style="color:#334155;"><strong>Scenario:</strong> {html.escape(str(meta.get('scenario', '—')))}</p>
-                <p style="color:#334155;"><strong>Persona:</strong> {html.escape(str(meta.get('persona', '—')))}</p>
-                <p style="color:#334155;"><strong>Interview:</strong> <code>{html.escape(selected_relative)}</code></p>
+            <div style="background:#fff; border:1px solid #e7e5e4; border-radius:10px; padding:1.25rem; margin-bottom:1rem;">
+                <h3 style="color:#292524;">Session metadata (transcript only)</h3>
+                <p style="color:#57534e;"><strong>Scenario:</strong> {html.escape(str(meta.get('scenario', '—')))}</p>
+                <p style="color:#57534e;"><strong>Persona:</strong> {html.escape(str(meta.get('persona', '—')))}</p>
+                <p style="color:#57534e;"><strong>Interview:</strong> <code>{html.escape(selected_relative)}</code></p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -299,7 +373,7 @@ def main() -> None:
                 st.markdown(f"**Turn {t.get('turn_id')} — {t.get('speaker', '?')}**")
                 st.markdown(f"> {t.get('text', '')}")
         st.sidebar.markdown("---")
-        st.sidebar.caption("Intervista IQR · Academic Dashboard")
+        st.sidebar.caption("Diagnostic Coach · IQR")
         return
 
     meta = evaluation_data.get("metadata") or transcript_data.get("metadata") or {}
@@ -308,22 +382,52 @@ def main() -> None:
     overall_summary = evaluation_data.get("overall_summary", "")
     results: List[Dict[str, Any]] = evaluation_data.get("evaluation_results") or []
 
-    # Header: white content blocks, deep charcoal / slate text
-    st.title("Intervista IQR Scoring Results")
-    st.markdown("<div style='margin-bottom: 1.5rem;'></div>", unsafe_allow_html=True)
+    st.title("Diagnostic Coach")
+    st.markdown(
+        "<p style='color:#57534e; font-size:1.05rem; margin-top:0;'>Interview Quality Rubric — feedback for your next session</p>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("<div style='margin-bottom: 0.75rem;'></div>", unsafe_allow_html=True)
+
+    if results:
+        mean_s, badge_title = session_skill_badge_parts(results, meta)
+        colors = coach_accent_colors(mean_s)
+        title_esc = html.escape(badge_title)
+        st.markdown(
+            f"""
+            <div style="
+                background: {colors['header_bg']};
+                border: 1px solid #e7e5e4;
+                border-left: 6px solid {colors['header_border']};
+                border-radius: 14px;
+                padding: 1.5rem 1.75rem;
+                margin-bottom: 1.35rem;
+                box-shadow: 0 8px 24px rgba(28, 25, 23, 0.08);
+            ">
+                <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; color: #78716c;
+                    text-transform: uppercase; margin-bottom: 0.4rem;">Skill level</div>
+                <div style="font-size: 2rem; font-weight: 800; color: #0c0a09; line-height: 1.2; letter-spacing: -0.02em;">
+                    <span style="color: {colors['header_accent']};">{mean_s:.1f}/10</span>
+                    <span style="color: #a8a29e; font-weight: 600;"> — </span>
+                    <span>{title_esc}</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     c1, c2 = st.columns([1, 1])
     with c1:
         st.markdown(
-            """
+            f"""
             <div style="
-                background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px;
-                padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+                background: #ffffff; border: 1px solid #e7e5e4; border-radius: 12px;
+                padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             ">
-                <h3 style="color: #1e293b; font-weight: 600; margin-top: 0;">Session metadata</h3>
-                <p style="color: #334155; margin: 0.5rem 0;"><strong>Scenario:</strong> """ + html.escape(str(scenario)) + """</p>
-                <p style="color: #334155; margin: 0.5rem 0;"><strong>Persona:</strong> """ + html.escape(str(persona)) + """</p>
-                <p style="color: #334155; margin: 0.5rem 0;"><strong>Interview:</strong> <code>""" + html.escape(selected_relative) + """</code></p>
+                <h3 style="color: #292524; font-weight: 600; margin-top: 0;">Session</h3>
+                <p style="color: #57534e; margin: 0.5rem 0;"><strong>Scenario:</strong> {html.escape(str(scenario))}</p>
+                <p style="color: #57534e; margin: 0.5rem 0;"><strong>Persona:</strong> {html.escape(str(persona))}</p>
+                <p style="color: #57534e; margin: 0.5rem 0;"><strong>Interview:</strong> <code>{html.escape(selected_relative)}</code></p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -333,116 +437,193 @@ def main() -> None:
         st.markdown(
             f"""
             <div style="
-                background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px;
-                padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+                background: #ffffff; border: 1px solid #e7e5e4; border-radius: 12px;
+                padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             ">
-                <h3 style="color: #1e293b; font-weight: 600; margin-top: 0;">Overall summary</h3>
-                <p style="color: #334155; line-height: 1.6;">{summary_esc}</p>
+                <h3 style="color: #292524; font-weight: 600; margin-top: 0;">Overall summary</h3>
+                <p style="color: #57534e; line-height: 1.65;">{summary_esc}</p>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    st.subheader("Dimension scores")
-    # Build dimension -> result map; preserve order (Questioning, Probing, Listening, Rapport, Ethics)
+    st.subheader("Dimension diagnostics")
     by_dim = {r.get("dimension_name"): r for r in results if r.get("dimension_name")}
     ordered = [by_dim[d] for d in DIMENSION_ORDER if d in by_dim]
     for r in results:
         if r.get("dimension_name") not in DIMENSION_ORDER:
             ordered.append(r)
 
-    # Single horizontal row of 5 metric cards above Detailed Feedback
-    cols = st.columns(5)
-    for i, res in enumerate(ordered[:5]):
-        with cols[i]:
-            render_metric_card(res.get("dimension_name", "—"), res.get("score", 0))
-
-    st.subheader("Detailed feedback")
-
     for res in ordered:
         dim_name = res.get("dimension_name", "Dimension")
-        score = res.get("score", 0)
+        score_raw = res.get("score", 0)
+        score = parse_dimension_score(score_raw, meta, results)
         label = res.get("label", "")
+        skill_dim = (res.get("skill_level_title") or "").strip()
         rationale = res.get("rationale", "")
         evidence = res.get("evidence") or {}
         student_quote = evidence.get("student_quote", "")
+        alt_phrasing = evidence.get("alternative_phrasing")
         stakeholder_cue = evidence.get("stakeholder_cue", "")
         turn_id = evidence.get("turn_id", "")
+        dim_colors = coach_accent_colors(score)
 
-        # Always-visible header (white bg, dark text) so dimension title is readable without relying on expander styling
+        icon = DIMENSION_ICONS.get(dim_name, "•")
+        dim_esc = html.escape(dim_name)
+        label_esc = html.escape(str(label))
+        skill_esc = html.escape(skill_dim) if skill_dim else ""
+        skill_suffix = (
+            f'<span style="font-size:0.88rem; font-weight:600; color:#78716c;"> · {skill_esc}</span>'
+            if skill_esc
+            else ""
+        )
+
         st.markdown(
             f"""
             <div style="
-                background: #ffffff; border: 1px solid #e5e7eb; border-bottom: none;
-                border-radius: 8px 8px 0 0; padding: 0.65rem 1rem;
-                margin-top: 0.75rem; margin-bottom: 0;
-                color: #1e293b; font-weight: 600; font-size: 1rem;
-            ">{html.escape(dim_name)} — Score: {score} ({html.escape(label)})</div>
+                background: #ffffff; border: 1px solid #e7e5e4;
+                border-radius: 12px 12px 0 0;
+                border-bottom: none;
+                padding: 0.85rem 1.1rem;
+                margin-top: 1.1rem; margin-bottom: 0;
+                color: #0c0a09; font-weight: 700; font-size: 1.08rem;
+            ">{icon} {dim_esc} — <span style="color:{dim_colors['header_accent']};">{score:.1f}/10</span>
+            <span style="font-weight:500; color:#57534e;">({label_esc})</span>{skill_suffix}</div>
             """,
             unsafe_allow_html=True,
         )
-        with st.expander("▼ Rationale & evidence", expanded=False):
-            st.markdown(
-                "<div style='background:#fff; color:#1e293b; padding:0.5rem 0;'>"
-                "<strong style='color:#1e293b;'>Rationale</strong></div>",
-                unsafe_allow_html=True,
+
+        col_left, col_right = st.columns(2)
+        sq_esc = html.escape(str(student_quote)).replace("\n", "<br/>")
+        if alt_phrasing:
+            alt_esc = html.escape(str(alt_phrasing)).replace("\n", "<br/>")
+            alt_body = alt_esc
+        else:
+            alt_body = (
+                '<span style="color:#a8a29e;font-style:italic;">No alternative phrasing for this '
+                "dimension—often because the evidence highlights a strength, not a closed turn.</span>"
             )
-            st.markdown(
-                f"<p style='color:#334155; line-height: 1.6;'>{html.escape(rationale).replace(chr(10), '<br/>')}</p>",
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                "<div style='background:#fff; color:#1e293b; padding:0.75rem 0 0.25rem 0;'>"
-                "<strong style='color:#1e293b;'>Evidence comparison</strong></div>",
-                unsafe_allow_html=True,
-            )
-            sq_esc = html.escape(student_quote).replace("\n", "<br/>")
-            sc_esc = html.escape(stakeholder_cue).replace("\n", "<br/>")
+
+        quote_style = (
+            "border-left: 4px solid #d97706; background: #fffbeb;"
+            if score < 8.0
+            else "border-left: 4px solid #059669; background: #ecfdf5;"
+        )
+
+        with col_left:
             st.markdown(
                 f"""
-                <div style="display: grid; gap: 0.75rem; margin-top: 0.5rem;">
-                    <div style="
-                        padding: 1rem; background: #e0f2fe; border: 1px solid #bae6fd;
-                        border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-                    ">
-                        <div style="font-weight: 700; color: #0c4a6e; margin-bottom: 0.5rem;">Student (turn {turn_id})</div>
-                        <div style="color: #1e293b; line-height: 1.5;">{sq_esc}</div>
-                    </div>
-                    <div style="
-                        padding: 1rem; background: #fce7f3; border: 1px solid #fbcfe8;
-                        border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-                    ">
-                        <div style="font-weight: 700; color: #831843; margin-bottom: 0.5rem;">Stakeholder cue</div>
-                        <div style="color: #1e293b; line-height: 1.5;">{sc_esc}</div>
-                    </div>
+                <div style="padding: 0; margin: 0;">
+                  <div style="
+                    {quote_style}
+                    border-radius: 0 0 0 0;
+                    padding: 1rem 1.15rem;
+                    min-height: 9rem;
+                    border: 1px solid #e7e5e4;
+                    border-top: none;
+                    border-right: none;
+                  ">
+                    <div style="font-weight: 800; font-size: 0.68rem; letter-spacing: 0.07em;
+                        text-transform: uppercase; color: #57534e; margin-bottom: 0.55rem;">What you said</div>
+                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.02rem;
+                        color: #1c1917; line-height: 1.6;">{sq_esc}</div>
+                    <div style="margin-top: 0.85rem; font-size: 0.75rem; color: #78716c;">Turn {html.escape(str(turn_id))}</div>
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_right:
+            suggest_border = "#fbbf24" if score < 8.0 else "#34d399"
+            suggest_bg = "#fffbeb" if score < 8.0 else "#ecfdf5"
+            st.markdown(
+                f"""
+                <div style="padding: 0; margin: 0;">
+                  <div style="
+                    background: {suggest_bg};
+                    border: 1px solid #e7e5e4;
+                    border-top: none;
+                    border-left: 1px solid {suggest_border};
+                    border-radius: 0 0 0 0;
+                    padding: 1rem 1.15rem;
+                    min-height: 9rem;
+                  ">
+                    <div style="font-weight: 800; font-size: 0.68rem; letter-spacing: 0.07em;
+                        text-transform: uppercase; color: #57534e; margin-bottom: 0.55rem;">Coach's suggestion</div>
+                    <div style="color: #1c1917; line-height: 1.6; font-size: 0.98rem;">{alt_body}</div>
+                  </div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
+        # Stakeholder + optional missed insight (hide for scores >= 9.0)
+        missed_plain = missed_insight_text(res)
+        insight_html = dimension_insight_card_html(
+            escape_html_multiline(str(stakeholder_cue)),
+            escape_html_multiline(missed_plain),
+            show_missed_insight=score < 9.0,
+        )
+        st.markdown(insight_html, unsafe_allow_html=True)
+
+        with st.expander("Full coach rationale", expanded=False):
+            st.markdown(
+                f"<p style='color:#44403c; line-height: 1.65;'>{html.escape(rationale).replace(chr(10), '<br/>')}</p>",
+                unsafe_allow_html=True,
+            )
+
+    actions = tactical_game_plan_three(evaluation_data)
+    bullets_html = "".join(
+        f"<li style='margin:0.5rem 0; color:#292524; line-height:1.55;'>{html.escape(a)}</li>" for a in actions
+    )
+    plan_colors = coach_accent_colors(session_skill_badge_parts(results, meta)[0] if results else 5.0)
+    st.markdown(
+        f"""
+        <div style="
+            background: {plan_colors['badge_soft']};
+            border: 1px solid #e7e5e4;
+            border-left: 5px solid {plan_colors['header_border']};
+            border-radius: 14px;
+            padding: 1.35rem 1.5rem;
+            margin: 1.5rem 0 1.25rem 0;
+            box-shadow: 0 4px 14px rgba(28, 25, 23, 0.06);
+        ">
+            <h3 style="color:#0c0a09; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.2rem;">Tactical game plan</h3>
+            <p style="color:#57534e; font-size: 0.92rem; margin: 0 0 0.75rem 0;">Your next session — three concrete habits to practice.</p>
+            <ul style="margin: 0; padding-left: 1.25rem;">{bullets_html}</ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.markdown("---")
     st.markdown(
         """
-        <h3 style="color:#1e293b; font-weight:600; margin:0.75rem 0 0.25rem 0;">Conversation transcript</h3>
-        <p style="color:#64748b; font-size:0.9rem; margin:0 0 0.5rem 0;">Full dialogue from the selected interview.</p>
+        <h3 style="color:#292524; font-weight:600; margin:0.75rem 0 0.25rem 0;">Conversation transcript</h3>
+        <p style="color:#78716c; font-size:0.9rem; margin:0 0 0.5rem 0;">Full dialogue from the selected interview.</p>
         """,
         unsafe_allow_html=True,
     )
     turns = transcript_data.get("turns") or []
     parts = [
-        "<div style='background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1.25rem; margin-top:0.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.06);'>"
+        "<div style='background:#fff; border:1px solid #e7e5e4; border-radius:12px; padding:1.25rem; margin-top:0.5rem;'>"
     ]
     for t in turns:
         tid = t.get("turn_id", "")
         speaker = html.escape(str(t.get("speaker", "?")))
         text = html.escape(str(t.get("text", ""))).replace("\n", "<br/>")
-        parts.append(f"<p style='color:#1e293b; font-weight:600; margin:0.75rem 0 0.25rem 0;'>Turn {tid} — {speaker}</p>")
-        parts.append(f"<p style='color:#334155; margin-left:1rem; line-height:1.5;'>{text}</p>")
+        parts.append(
+            f"<p style='color:#292524; font-weight:600; margin:0.75rem 0 0.25rem 0;'>Turn {tid} — {speaker}</p>"
+        )
+        parts.append(
+            f"<p style='margin-left:0.75rem; padding:0.65rem 0.85rem; border-left:3px solid #d6d3d1; "
+            f"background:#fafaf9; border-radius:0 8px 8px 0; color:#44403c; line-height:1.55;'>{text}</p>"
+        )
     parts.append("</div>")
     st.markdown("".join(parts), unsafe_allow_html=True)
 
     st.sidebar.markdown("---")
-    st.sidebar.caption("Intervista IQR · Academic Dashboard")
+    st.sidebar.caption("Diagnostic Coach · IQR")
 
 
 if __name__ == "__main__":

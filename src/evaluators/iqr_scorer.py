@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.output_parsers import PydanticOutputParser
@@ -10,6 +10,29 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from src.core.llm_factory import get_llm
 from src.utils.schema import SessionEvaluation, Transcript
+
+# Session metadata merged into every successful evaluation so downstream systems
+# know the rubric uses a 1.0–10.0 float scale with Phase-1 skill titles.
+IQR_RUBRIC_METADATA: Dict[str, Any] = {
+    "iqr_score_scale": "10-point",
+    "iqr_score_min": 1.0,
+    "iqr_score_max": 10.0,
+    "iqr_skill_bands": (
+        "6.0–6.9 Novice Fact-Finder; 7.0–7.9 Emerging Technical Interviewer; "
+        "8.0–8.9 Competent Operational Interviewer; 9.0–9.9 Advanced Systems "
+        "Interviewer; 10.0 Master Stakeholder Partner"
+    ),
+}
+
+# Injected next to the system prompt so the model maps score ↔ skill_level_title
+# consistently with the diagnostic bands (including sub-6.0 scores).
+IQR_SKILL_SCALE_CONTEXT = """\
+**10-point mapping (apply per dimension):**
+- Set `score` to a float in [1.0, 10.0] (half steps allowed, e.g. 6.5).
+- Set `skill_level_title` to the **exact quoted title** from Phase 1 whose band contains that score (e.g. 7.4 → "Emerging Technical Interviewer").
+- For scores **below 6.0**, choose the closest Phase 1 title by meaning and say so in `rationale`, or use a concise developmental label that fits the band (e.g. approaching "Novice Fact-Finder").
+- **Closed-turn rule:** If Phase 2 identifies a "Closed Turn" for evidence tied to a dimension, you **must** populate `evidence.alternative_phrasing` (the Bridge) and `line_of_inquiry_impact` (the lost line of inquiry). If there is no closed turn for that dimension’s evidence, set both fields to `null`.
+"""
 
 
 class IQRScorer:
@@ -38,7 +61,8 @@ class IQRScorer:
         self._prompt_path = Path(prompt_path)
         self._system_prompt = self._load_prompt(self._prompt_path)
 
-        # Pydantic-based structured output parser for SessionEvaluation.
+        # Pydantic-based structured output parser: must match `SessionEvaluation`
+        # in src/utils/schema.py (nested IQREvaluation + Evidence diagnostic fields).
         self._parser = PydanticOutputParser(pydantic_object=SessionEvaluation)
 
         # Build the internal LangChain chain once and reuse it.
@@ -69,6 +93,7 @@ class IQRScorer:
                     "system",
                     (
                         "{system_prompt}\n\n"
+                        "{rubric_context}\n\n"
                         "{format_instructions}"
                     ),
                 ),
@@ -95,7 +120,7 @@ class IQRScorer:
         """
         # Edge case: empty transcript should not be scored.
         if not transcript.turns:
-            base_metadata = dict(transcript.metadata or {})
+            base_metadata = {**dict(transcript.metadata or {}), **IQR_RUBRIC_METADATA}
             base_metadata["status"] = "Incomplete"
             return SessionEvaluation(
                 metadata=base_metadata,
@@ -112,18 +137,23 @@ class IQRScorer:
         transcript_payload: Any = transcript.model_dump()
         transcript_json = json.dumps(transcript_payload, ensure_ascii=False, indent=2)
 
-        try:
-            result: SessionEvaluation = await self._chain.ainvoke(
-                {
-                    "system_prompt": self._system_prompt,
-                    "format_instructions": self._parser.get_format_instructions(),
-                    "transcript_json": transcript_json,
-                }
-            )
+        chain_input = {
+            "system_prompt": self._system_prompt,
+            "rubric_context": IQR_SKILL_SCALE_CONTEXT,
+            "format_instructions": self._parser.get_format_instructions(),
+            "transcript_json": transcript_json,
+        }
 
-            # Ensure standardized metadata (including session_id/persona_id/scenario_id)
-            # is present on the final SessionEvaluation object.
-            result.metadata = {**result.metadata, **base_metadata}
+        try:
+            result: SessionEvaluation = await self._chain.ainvoke(chain_input)
+
+            # Session + transcript metadata, then model-returned metadata, then fixed
+            # IQR scale keys (so stakeholders always see 10-point mapping context).
+            result.metadata = {
+                **base_metadata,
+                **result.metadata,
+                **IQR_RUBRIC_METADATA,
+            }
             return result
         except Exception:
             # Fallback logic: retry with a high-reliability OpenAI model (e.g., GPT-4o)
@@ -131,15 +161,13 @@ class IQRScorer:
             fallback_llm = get_llm(provider="openai", model_name="gpt-4o", temperature=0.0)
             fallback_chain = self._build_chain(llm=fallback_llm)
 
-            result: SessionEvaluation = await fallback_chain.ainvoke(
-                {
-                    "system_prompt": self._system_prompt,
-                    "format_instructions": self._parser.get_format_instructions(),
-                    "transcript_json": transcript_json,
-                }
-            )
+            result: SessionEvaluation = await fallback_chain.ainvoke(chain_input)
 
-            result.metadata = {**result.metadata, **base_metadata}
+            result.metadata = {
+                **base_metadata,
+                **result.metadata,
+                **IQR_RUBRIC_METADATA,
+            }
             return result
 
 

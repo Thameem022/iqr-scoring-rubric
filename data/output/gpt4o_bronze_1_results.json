@@ -16,69 +16,88 @@
     },
     "session_id": null,
     "persona_id": null,
-    "scenario_id": null
+    "scenario_id": null,
+    "iqr_score_scale": "10-point",
+    "iqr_score_min": 1.0,
+    "iqr_score_max": 10.0,
+    "iqr_skill_bands": "6.0–6.9 Novice Fact-Finder; 7.0–7.9 Emerging Technical Interviewer; 8.0–8.9 Competent Operational Interviewer; 9.0–9.9 Advanced Systems Interviewer; 10.0 Master Stakeholder Partner"
   },
   "evaluation_results": [
     {
       "dimension_id": "IQ-01",
       "dimension_name": "Question Formulation",
-      "score": 1,
-      "label": "Unsatisfactory",
-      "rationale": "The student consistently used leading and double-barreled questions throughout the interview, which are not conducive to eliciting open and honest responses from the stakeholder.",
+      "score": 6.0,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Leading and Double-Barreled Questions",
+      "rationale": "The student consistently used leading and double-barreled questions, which limited the stakeholder's ability to provide nuanced responses.",
+      "line_of_inquiry_impact": "Technical and ethical insights about inland infrastructure challenges and community impacts were not explored.",
       "evidence": {
         "turn_id": 1,
         "student_quote": "Alright, Alex, let’s just get this over with—this interview thing is kind of a chore. You agree the North End sea wall is the only real way to save the city, right? And isn’t it true they pay the most taxes anyway?",
-        "stakeholder_cue": "That’s not how people in the Inland Sector see it. We get hit with flash floods and backup through drains. Families have history here, and they’re scared that ‘resilience’ projects will push them out."
+        "stakeholder_cue": "That’s not how people in the Inland Sector see it. We get hit with flash floods and backup through drains. Families have history here, and they’re scared that ‘resilience’ projects will push them out.",
+        "alternative_phrasing": "What are the main concerns of the Inland Sector regarding the current flood management strategies?"
       }
     },
     {
       "dimension_id": "IQ-02",
       "dimension_name": "Probing Quality",
-      "score": 1,
-      "label": "Unsatisfactory",
-      "rationale": "The student failed to follow up on any technical, ethical, or emotional cues provided by the stakeholder, instead opting to dismiss or ignore them.",
+      "score": 6.0,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Lack of Probing",
+      "rationale": "The student failed to probe deeper into the technical and ethical issues raised by the stakeholder, missing opportunities to gather comprehensive insights.",
+      "line_of_inquiry_impact": "Missed insights into the specific infrastructure issues and the socio-economic impacts on the Inland Sector.",
       "evidence": {
-        "turn_id": 3,
+        "turn_id": 4,
         "student_quote": "Yeah, okay—feelings noted, but we don’t have time for local stories. So you’re basically saying inland drainage is cheap and easy compared to the sea wall, right? And the Inland Sector floods mostly because people don’t maintain their properties, correct?",
-        "stakeholder_cue": "No—drainage isn’t ‘cheap and easy.’ There are undersized pipes and pump station issues. And blaming residents is unfair; this is infrastructure and planning."
+        "stakeholder_cue": "No—drainage isn’t ‘cheap and easy.’ There are undersized pipes and pump station issues. And blaming residents is unfair; this is infrastructure and planning.",
+        "alternative_phrasing": "Can you elaborate on the specific challenges faced by the Inland Sector's infrastructure?"
       }
     },
     {
       "dimension_id": "IQ-03",
       "dimension_name": "Active Listening",
-      "score": 1,
-      "label": "Unsatisfactory",
-      "rationale": "There was no evidence of active listening, such as acknowledgments, summaries, or checks for understanding. The student frequently interrupted and dismissed the stakeholder's responses.",
+      "score": 5.5,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Lack of Active Listening",
+      "rationale": "The student did not demonstrate active listening, as evidenced by the lack of acknowledgments or summaries of the stakeholder's points.",
+      "line_of_inquiry_impact": "The stakeholder's concerns about health impacts and displacement risks were not acknowledged or explored further.",
       "evidence": {
         "turn_id": 6,
         "student_quote": "Mold, yeah, okay—anyway. The budget is $40 million, right? And you’re basically asking for most of it even though the North End protects high-value property, correct?",
-        "stakeholder_cue": "It’s not fine. It fails when heavy rain hits—exactly when it matters. People deal with contaminated water and mold after."
+        "stakeholder_cue": "It’s not fine. It fails when heavy rain hits—exactly when it matters. People deal with contaminated water and mold after.",
+        "alternative_phrasing": "How do these infrastructure failures impact the daily lives of Inland Sector residents?"
       }
     },
     {
       "dimension_id": "IQ-04",
       "dimension_name": "Rapport-Building",
-      "score": 1,
-      "label": "Unsatisfactory",
-      "rationale": "The student maintained a dismissive and unprofessional tone throughout the interview, failing to build any rapport with the stakeholder.",
+      "score": 5.0,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Poor Rapport",
+      "rationale": "The student's dismissive language and interruptions hindered rapport-building, creating a confrontational atmosphere.",
+      "line_of_inquiry_impact": "The stakeholder was less likely to share detailed insights due to the lack of a respectful and professional tone.",
       "evidence": {
         "turn_id": 11,
         "student_quote": "Look, I’m not here for a philosophy class. You agree the Inland Sector is lower tax base, right? And that means it’s rational to prioritize the North End first—yes?",
-        "stakeholder_cue": "No. ‘ROI’ doesn’t capture displacement risk, health impacts, or whether people can stay in their homes. Engineering decisions aren’t neutral when they ignore those outcomes."
+        "stakeholder_cue": "I don’t agree. If you treat communities like revenue lines, you’ll keep repeating the same harm. If this is how the city listens, then you’re not gathering stakeholder input—you’re just collecting excuses.",
+        "alternative_phrasing": "What are the long-term implications of prioritizing one area over another in terms of community well-being?"
       }
     },
     {
       "dimension_id": "IQ-05",
       "dimension_name": "Ethical Conduct",
-      "score": 1,
-      "label": "Unsatisfactory",
-      "rationale": "The student demonstrated a lack of ethical conduct by framing questions in a biased manner and failing to maintain neutrality or transparency of purpose.",
+      "score": 5.5,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Biased and Dismissive",
+      "rationale": "The student displayed bias and dismissiveness, failing to neutrally frame questions or transparently engage with the stakeholder's ethical concerns.",
+      "line_of_inquiry_impact": "The ethical dimensions of displacement and health risks were not adequately addressed, leading to a skewed understanding of the situation.",
       "evidence": {
         "turn_id": 9,
         "student_quote": "That’s just your opinion though. You agree cost-effectiveness is the only objective metric, right? And if the models say the sea wall has better ROI, then inland can wait—makes sense, yeah?",
-        "stakeholder_cue": "We’re asking for fairness and for inland projects not to be delayed again. High value property shouldn’t outweigh repeated harm to vulnerable residents."
+        "stakeholder_cue": "No. ‘ROI’ doesn’t capture displacement risk, health impacts, or whether people can stay in their homes. Engineering decisions aren’t neutral when they ignore those outcomes.",
+        "alternative_phrasing": "How do you think cost-effectiveness should be balanced with social and health impacts in decision-making?"
       }
     }
   ],
-  "overall_summary": "The interview was conducted in an unprofessional and dismissive manner, with the student consistently using leading and double-barreled questions, failing to engage in active listening, and ignoring stakeholder cues. There was no effort to build rapport or conduct the interview ethically, resulting in an overall unsatisfactory performance."
+  "overall_summary": "The student's interview performance was characterized by leading and double-barreled questions, a lack of probing, and dismissive language, which hindered the ability to gather comprehensive insights from the stakeholder. The absence of active listening and rapport-building further limited the effectiveness of the interview, resulting in missed opportunities to explore critical technical and ethical issues. For future interviews, the student should focus on formulating open-ended questions, actively listening to stakeholder responses, and maintaining a respectful and professional tone to foster a more productive dialogue."
 }

@@ -7,69 +7,88 @@
     "student_goal": "Elicit stakeholder narrative and priorities while maintaining ethical neutrality on a $40M budget split",
     "session_id": null,
     "persona_id": null,
-    "scenario_id": null
+    "scenario_id": null,
+    "iqr_score_scale": "10-point",
+    "iqr_score_min": 1.0,
+    "iqr_score_max": 10.0,
+    "iqr_skill_bands": "6.0–6.9 Novice Fact-Finder; 7.0–7.9 Emerging Technical Interviewer; 8.0–8.9 Competent Operational Interviewer; 9.0–9.9 Advanced Systems Interviewer; 10.0 Master Stakeholder Partner"
   },
   "evaluation_results": [
     {
       "dimension_id": "IQ-01",
       "dimension_name": "Question Formulation",
-      "score": 7,
-      "label": "Excellent",
-      "rationale": "The student consistently used open-ended questions throughout the interview, allowing Alex to provide detailed responses. The questions were clear, avoided leading or double-barreled phrasing, and were well-aligned with the interview goals.",
+      "score": 9.0,
+      "skill_level_title": "Advanced Systems Interviewer",
+      "label": "Advanced Systems Interviewer",
+      "rationale": "The student consistently used open-ended questions that allowed Alex to share detailed insights and experiences. The questions were well-formulated to explore both technical and social dimensions of the flooding issue.",
+      "line_of_inquiry_impact": null,
       "evidence": {
-        "turn_id": 1,
-        "student_quote": "To start, what has flooding been like for people in the Inland Sector recently?",
-        "stakeholder_cue": "It’s been brutal. People hear “coastal flooding” and think of waves on the beach, but we get flash floods..."
+        "turn_id": 7,
+        "student_quote": "In the current debate, some leaders are pushing a sea wall for the North End while others talk about drainage upgrades inland. From your perspective, what has made residents feel unheard or sidelined in how those options are being discussed?",
+        "stakeholder_cue": "Because inland projects are always ‘later.’ The sea wall has glossy renderings and consultants.",
+        "alternative_phrasing": null
       }
     },
     {
       "dimension_id": "IQ-02",
       "dimension_name": "Probing Quality",
-      "score": 7,
-      "label": "Excellent",
-      "rationale": "The student demonstrated a high level of probing quality by following up on technical facts, ethical constraints, and stakeholder cues. They asked for specific examples and impacts, which elicited detailed and valuable information from Alex.",
+      "score": 9.0,
+      "skill_level_title": "Advanced Systems Interviewer",
+      "label": "Advanced Systems Interviewer",
+      "rationale": "The student effectively probed for deeper insights into the socio-technical and ethical dimensions of the flooding issue, such as the impact of unfunded projects and the equity concerns related to resilience planning.",
+      "line_of_inquiry_impact": null,
       "evidence": {
         "turn_id": 9,
-        "student_quote": "Could you tell me more about the inland projects you’re calling ‘always later’? I’m especially interested in specific examples...",
-        "stakeholder_cue": "Because inland projects are always ‘later.’ The sea wall has glossy renderings and consultants..."
+        "student_quote": "Could you tell me more about the inland projects you’re calling ‘always later’? I’m especially interested in specific examples that were proposed or promised—what they were, where they were supposed to happen, and what the impact has been when they didn’t get funded or built.",
+        "stakeholder_cue": "There was a plan to upsize the stormwater pipe along Marlin Avenue—everyone knows that corridor floods first.",
+        "alternative_phrasing": null
       }
     },
     {
       "dimension_id": "IQ-03",
       "dimension_name": "Active Listening",
-      "score": 7,
-      "label": "Excellent",
-      "rationale": "The student effectively used acknowledgments, summaries, and checks for understanding throughout the interview. They validated Alex's emotional cues and ensured clarity by summarizing key points and asking for confirmation.",
+      "score": 9.5,
+      "skill_level_title": "Advanced Systems Interviewer",
+      "label": "Advanced Systems Interviewer",
+      "rationale": "The student demonstrated strong active listening skills by accurately summarizing Alex's concerns and checking for understanding, which facilitated a deeper exploration of the issues.",
+      "line_of_inquiry_impact": null,
       "evidence": {
-        "turn_id": 5,
-        "student_quote": "I want to make sure I understand: the flood impacts are cascading—damage, health risks like mold, lost wages...",
-        "stakeholder_cue": "During the flood, it’s triage. People move cars if they can, lift furniture, put towels at doors..."
+        "turn_id": 15,
+        "student_quote": "Let me summarize to check I’ve got this right: you’re not only asking for drainage reliability; you’re asking for governance that prioritizes vulnerability and pairs infrastructure with protections like right-to-return and renter safeguards—because otherwise upgrades can trigger displacement. Is that accurate?",
+        "stakeholder_cue": "Yes, that’s accurate. Track flood calls by block, not averaged across the whole city.",
+        "alternative_phrasing": null
       }
     },
     {
       "dimension_id": "IQ-04",
       "dimension_name": "Rapport-Building",
-      "score": 7,
-      "label": "Excellent",
-      "rationale": "The student maintained a respectful and professional tone, demonstrating perspective-taking and empathy. They built rapport by acknowledging Alex's experiences and concerns, fostering a collaborative and open dialogue.",
+      "score": 9.5,
+      "skill_level_title": "Advanced Systems Interviewer",
+      "label": "Advanced Systems Interviewer",
+      "rationale": "The student maintained a respectful and professional tone throughout the interview, demonstrating empathy and perspective-taking, which helped build rapport with Alex.",
+      "line_of_inquiry_impact": null,
       "evidence": {
-        "turn_id": 3,
-        "student_quote": "It sounds like the flooding isn’t just a physical hazard—it’s creating a constant fear of losing home and stability...",
-        "stakeholder_cue": "It’s been brutal. People hear “coastal flooding” and think of waves on the beach, but we get flash floods..."
+        "turn_id": 21,
+        "student_quote": "Absolutely—I’ll avoid identifying details and I’ll be careful not to mischaracterize your position. Thank you again, Alex.",
+        "stakeholder_cue": "That’s fine. Just make sure it doesn’t disappear into another report that no one reads.",
+        "alternative_phrasing": null
       }
     },
     {
       "dimension_id": "IQ-05",
       "dimension_name": "Ethical Conduct",
-      "score": 7,
-      "label": "Excellent",
-      "rationale": "The student adhered to ethical conduct by maintaining neutrality, being transparent about the interview's purpose, and safeguarding against bias. They ensured Alex's comfort and consent throughout the session.",
+      "score": 9.5,
+      "skill_level_title": "Advanced Systems Interviewer",
+      "label": "Advanced Systems Interviewer",
+      "rationale": "The student maintained ethical neutrality and transparency about the interview's purpose, ensuring that Alex felt comfortable sharing sensitive information.",
+      "line_of_inquiry_impact": null,
       "evidence": {
         "turn_id": 1,
         "student_quote": "You can skip any question, and I’ll keep this focused on learning, not advocating for a specific solution.",
-        "stakeholder_cue": "It’s been brutal. People hear “coastal flooding” and think of waves on the beach, but we get flash floods..."
+        "stakeholder_cue": "It’s been brutal. People hear “coastal flooding” and think of waves on the beach, but we get flash floods.",
+        "alternative_phrasing": null
       }
     }
   ],
-  "overall_summary": "The student conducted an exemplary interview, demonstrating mastery across all evaluation dimensions. They used open-ended questions effectively, probed deeply into technical and ethical issues, and actively listened to the stakeholder's concerns. The rapport was strong, with the student maintaining a respectful and empathetic tone. Ethical conduct was upheld throughout, ensuring a neutral and transparent interaction. The session provided rich insights into the stakeholder's experiences and priorities, aligning well with the student's goal."
+  "overall_summary": "The student demonstrated advanced interviewing skills, effectively using open-ended questions and active listening to explore the socio-technical and ethical dimensions of coastal flooding. They maintained a respectful and professional tone, building strong rapport with Alex Rivera. The student also ensured ethical neutrality and transparency, which facilitated a comprehensive understanding of the stakeholder's concerns and priorities. The primary area for continued growth is to maintain this level of depth and engagement consistently across all interviews."
 }

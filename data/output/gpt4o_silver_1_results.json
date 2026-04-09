@@ -10,69 +10,88 @@
     },
     "session_id": null,
     "persona_id": null,
-    "scenario_id": null
+    "scenario_id": null,
+    "iqr_score_scale": "10-point",
+    "iqr_score_min": 1.0,
+    "iqr_score_max": 10.0,
+    "iqr_skill_bands": "6.0–6.9 Novice Fact-Finder; 7.0–7.9 Emerging Technical Interviewer; 8.0–8.9 Competent Operational Interviewer; 9.0–9.9 Advanced Systems Interviewer; 10.0 Master Stakeholder Partner"
   },
   "evaluation_results": [
     {
       "dimension_id": "IQ-01",
       "dimension_name": "Question Formulation",
-      "score": 2,
-      "label": "Needs Improvement",
-      "rationale": "The student consistently used closed-ended and leading questions, which limited the depth of responses and failed to explore the stakeholder's concerns about equity and displacement.",
+      "score": 6.5,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Question Formulation",
+      "rationale": "The student consistently used closed-ended and leading questions, which limited the depth of responses from the stakeholder.",
+      "line_of_inquiry_impact": "Technical and ethical insights were missed due to the closed nature of questions.",
       "evidence": {
         "turn_id": 1,
         "student_quote": "Let's stick to the data. First: the city has a $40M capital allocation under discussion—yes or no?",
-        "stakeholder_cue": "But people in the Inland Sector are scared—flooding isn't just water, it's the fear of getting pushed out of a neighborhood their families built over generations."
+        "stakeholder_cue": "But people in the Inland Sector are scared—flooding isn't just water, it's the fear of getting pushed out of a neighborhood their families built over generations.",
+        "alternative_phrasing": "How do you see the $40M capital allocation impacting the Inland Sector, especially considering the community's concerns?"
       }
     },
     {
       "dimension_id": "IQ-02",
       "dimension_name": "Probing Quality",
-      "score": 2,
-      "label": "Needs Improvement",
-      "rationale": "The student failed to probe deeper into the emotional and ethical cues provided by the stakeholder, focusing narrowly on technical data and cost-effectiveness.",
+      "score": 6.0,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Probing Quality",
+      "rationale": "The student failed to probe deeper into the socio-technical and ethical issues raised by the stakeholder, focusing narrowly on technical data.",
+      "line_of_inquiry_impact": "Missed opportunity to explore the socio-technical implications of budget allocations and community impact.",
       "evidence": {
         "turn_id": 3,
         "student_quote": "I'm only interested in the budget right now.",
-        "stakeholder_cue": "But that's not the point. The point is these projects keep getting deferred while the North End gets fast-tracked."
+        "stakeholder_cue": "The point is these projects keep getting deferred while the North End gets fast-tracked.",
+        "alternative_phrasing": "What are the implications of project deferrals for the Inland Sector, and how does this affect community trust?"
       }
     },
     {
       "dimension_id": "IQ-03",
       "dimension_name": "Active Listening",
-      "score": 3,
-      "label": "Basic",
-      "rationale": "The student provided mechanical acknowledgments but did not demonstrate understanding or validation of the stakeholder's concerns about equity and displacement.",
+      "score": 6.5,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Active Listening",
+      "rationale": "The student acknowledged responses but did not demonstrate understanding or engage with the emotional and ethical dimensions presented.",
+      "line_of_inquiry_impact": "Limited engagement with stakeholder's emotional and ethical concerns, reducing the richness of the dialogue.",
       "evidence": {
         "turn_id": 5,
         "student_quote": "Acknowledged. Next question: the sea wall proposal for the North End is approximately $25M to $30M including design and permitting—correct?",
-        "stakeholder_cue": "But when you put that much into one neighborhood, you're deciding who gets protected."
+        "stakeholder_cue": "But when you put that much into one neighborhood, you're deciding who gets protected.",
+        "alternative_phrasing": "How do you feel about the allocation of resources to the North End, and what impact does this have on other areas?"
       }
     },
     {
       "dimension_id": "IQ-04",
       "dimension_name": "Rapport-Building",
-      "score": 2,
-      "label": "Needs Improvement",
-      "rationale": "The student maintained a professional tone but failed to build rapport by dismissing the stakeholder's emotional and ethical concerns, focusing solely on technical data.",
+      "score": 6.0,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Rapport-Building",
+      "rationale": "The student's rigid focus on technical data and dismissal of emotional cues hindered rapport-building with the stakeholder.",
+      "line_of_inquiry_impact": "The stakeholder's willingness to share deeper insights was likely reduced due to the lack of rapport.",
       "evidence": {
         "turn_id": 7,
         "student_quote": "That is outside the scope of this technical review. Let's stick to the data.",
-        "stakeholder_cue": "Inland has flooded repeatedly—kids walk through dirty water to school."
+        "stakeholder_cue": "Inland has flooded repeatedly—kids walk through dirty water to school.",
+        "alternative_phrasing": "What are the broader impacts of repeated flooding on the Inland community, especially for children?"
       }
     },
     {
       "dimension_id": "IQ-05",
       "dimension_name": "Ethical Conduct",
-      "score": 3,
-      "label": "Basic",
-      "rationale": "The student maintained a neutral framing in technical questions but showed bias by prioritizing cost-effectiveness over equity, which could influence the stakeholder's responses.",
+      "score": 6.5,
+      "skill_level_title": "Novice Fact-Finder",
+      "label": "Ethical Conduct",
+      "rationale": "The student maintained a neutral tone but failed to address ethical concerns raised by the stakeholder, focusing instead on technical data.",
+      "line_of_inquiry_impact": "Ethical considerations related to equity and displacement were not adequately explored.",
       "evidence": {
         "turn_id": 17,
-        "student_quote": "That is acceptable from a technical standpoint, correct?",
-        "stakeholder_cue": "If you ignore who benefits and who gets displaced, you're not doing neutral engineering."
+        "student_quote": "Final budget allocation question: given $40M total, the optimal approach is to fund whichever option yields the lowest cost per avoided dollar of damage—even if that concentrates spending in the North End.",
+        "stakeholder_cue": "If you ignore who benefits and who gets displaced, you're not doing neutral engineering.",
+        "alternative_phrasing": "How can we ensure that budget allocations consider both cost-effectiveness and equitable protection for all communities?"
       }
     }
   ],
-  "overall_summary": "The interview demonstrated technical proficiency but lacked depth in addressing emotional and ethical concerns. The student used closed-ended and leading questions, which limited the exploration of stakeholder perspectives. Active listening was basic, with mechanical acknowledgments but no validation of stakeholder concerns. Rapport-building was weak due to the dismissal of emotional and ethical issues. Ethical conduct was basic, with a neutral tone but biased framing towards cost-effectiveness."
+  "overall_summary": "The student demonstrated a strong focus on technical data collection but struggled to engage with the emotional and ethical dimensions of the stakeholder's concerns. The use of closed-ended and leading questions limited the depth of the dialogue, and the student's rigid adherence to technical scope hindered rapport-building and active listening. Future interviews should incorporate open-ended questions and a more balanced approach to technical and ethical considerations to foster richer stakeholder engagement."
 }
