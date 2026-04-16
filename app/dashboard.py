@@ -238,8 +238,88 @@ DIMENSION_ICONS = {
 }
 
 
+# One-sentence description for each skill band shown below the score badge
+SKILL_LEVEL_DESCRIPTIONS: Dict[str, str] = {
+    "Novice Fact-Finder": (
+        "A novice fact-finder can collect surface-level information but relies heavily on closed questions, "
+        "rarely probes beyond the obvious, and tends to capture what happened without uncovering why."
+    ),
+    "Developing interviewer": (
+        "Beginning to form structured questions but still inconsistent in probing and follow-through; "
+        "often misses cues that warrant deeper exploration."
+    ),
+    "Emerging Technical Interviewer": (
+        "Demonstrates growing command of open-ended questions and targeted probes, "
+        "though depth and consistency still vary across topics."
+    ),
+    "Competent Operational Interviewer": (
+        "Reliably structures sessions, uses probing effectively, and surfaces most relevant details; "
+        "minor gaps remain in rapport and adaptive follow-up."
+    ),
+    "Advanced Systems Interviewer": (
+        "Combines strong technique with contextual awareness, consistently drawing out root causes "
+        "and stakeholder perspectives with minimal wasted turns."
+    ),
+    "Master Stakeholder Partner": (
+        "Fluently adapts to any interview context, builds genuine rapport, and extracts nuanced insight "
+        "that less experienced interviewers routinely miss."
+    ),
+}
+
+# Glossary of common interview technique terms referenced in coach feedback
+GLOSSARY: List[Dict[str, str]] = [
+    {
+        "term": "Leading question",
+        "definition": (
+            "A question that subtly steers the respondent toward a particular answer by embedding an assumption "
+            "or preferred outcome (e.g., 'You were satisfied with the process, weren't you?'). "
+            "Leading questions bias the data and should be replaced with neutral, open-ended alternatives."
+        ),
+    },
+    {
+        "term": "Double-barreled question",
+        "definition": (
+            "A single question that asks about two separate issues at once "
+            "(e.g., 'Was the process clear and did you feel supported?'). "
+            "The respondent cannot answer both parts accurately in one reply; split them into two distinct questions."
+        ),
+    },
+    {
+        "term": "Closed question",
+        "definition": (
+            "A question that invites only a yes/no or single-word answer, limiting the information gathered "
+            "(e.g., 'Did you attend the meeting?'). Use closed questions sparingly—mainly to confirm facts."
+        ),
+    },
+    {
+        "term": "Open-ended question",
+        "definition": (
+            "A question that invites the respondent to elaborate freely "
+            "(e.g., 'Can you walk me through what happened?'). "
+            "Open-ended questions are the primary tool for uncovering context, reasoning, and detail."
+        ),
+    },
+    {
+        "term": "Probing question",
+        "definition": (
+            "A follow-up question that digs deeper into a previous response to surface root causes, "
+            "nuance, or unstated assumptions (e.g., 'What led you to that conclusion?'). "
+            "Effective probing distinguishes strong interviewers from those who merely collect facts."
+        ),
+    },
+    {
+        "term": "Rapport-building",
+        "definition": (
+            "Techniques used to establish trust and psychological safety with the interviewee—such as "
+            "acknowledging responses, using the person's name, or briefly normalising difficult topics—"
+            "so that they feel comfortable sharing openly."
+        ),
+    },
+]
+
+
 def inject_coach_theme_css() -> None:
-    """Diagnostic Coach theme: coach-oriented palette, quote styling, expanders."""
+    """Interview Diagnostic Coach theme: coach-oriented palette, quote styling, expanders."""
     st.markdown(
         """
         <style>
@@ -302,7 +382,7 @@ def inject_coach_theme_css() -> None:
 
 def main() -> None:
     st.set_page_config(
-        page_title="Diagnostic Coach — IQR",
+        page_title="Interview Diagnostic Coach — IQR",
         page_icon="🎯",
         layout="wide",
         initial_sidebar_state="expanded",
@@ -310,7 +390,7 @@ def main() -> None:
     inject_coach_theme_css()
 
     st.sidebar.markdown(
-        "<h1 style='color: #b45309; font-weight: 700; margin-bottom: 0.25rem;'>Diagnostic Coach</h1>",
+        "<h1 style='color: #b45309; font-weight: 700; margin-bottom: 0.25rem;'>Interview Diagnostic Coach</h1>",
         unsafe_allow_html=True,
     )
     st.sidebar.markdown(
@@ -382,7 +462,7 @@ def main() -> None:
     overall_summary = evaluation_data.get("overall_summary", "")
     results: List[Dict[str, Any]] = evaluation_data.get("evaluation_results") or []
 
-    st.title("Diagnostic Coach")
+    st.title("Interview Diagnostic Coach")
     st.markdown(
         "<p style='color:#57534e; font-size:1.05rem; margin-top:0;'>Interview Quality Rubric — feedback for your next session</p>",
         unsafe_allow_html=True,
@@ -393,6 +473,13 @@ def main() -> None:
         mean_s, badge_title = session_skill_badge_parts(results, meta)
         colors = coach_accent_colors(mean_s)
         title_esc = html.escape(badge_title)
+        desc = SKILL_LEVEL_DESCRIPTIONS.get(badge_title, "")
+        desc_html = (
+            f'<p style="color:#57534e; font-size:0.93rem; line-height:1.6; margin:0.6rem 0 0 0;">'
+            f'{html.escape(desc)}</p>'
+            if desc
+            else ""
+        )
         st.markdown(
             f"""
             <div style="
@@ -411,6 +498,7 @@ def main() -> None:
                     <span style="color: #a8a29e; font-weight: 600;"> — </span>
                     <span>{title_esc}</span>
                 </div>
+                {desc_html}
             </div>
             """,
             unsafe_allow_html=True,
@@ -493,6 +581,26 @@ def main() -> None:
             unsafe_allow_html=True,
         )
 
+        # 1. Overarching assessment (rationale) — shown first
+        st.markdown(
+            f"""
+            <div style="
+                background: #ffffff; border: 1px solid #e7e5e4;
+                border-top: none;
+                padding: 0.9rem 1.15rem 0.75rem 1.15rem;
+                margin-bottom: 0;
+            ">
+                <div style="font-weight: 800; font-size: 0.68rem; letter-spacing: 0.07em;
+                    text-transform: uppercase; color: #57534e; margin-bottom: 0.45rem;">Assessment</div>
+                <p style="color:#44403c; line-height:1.65; margin:0; font-size:0.97rem;">
+                    {html.escape(rationale).replace(chr(10), '<br/>')}
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        # 2. Evidence and Coach's suggestion — side by side
         col_left, col_right = st.columns(2)
         sq_esc = html.escape(str(student_quote)).replace("\n", "<br/>")
         if alt_phrasing:
@@ -557,7 +665,7 @@ def main() -> None:
                 unsafe_allow_html=True,
             )
 
-        # Stakeholder + optional missed insight (hide for scores >= 9.0)
+        # 3. Consequences — stakeholder cue + missed insight (only for lower-scoring turns)
         missed_plain = missed_insight_text(res)
         insight_html = dimension_insight_card_html(
             escape_html_multiline(str(stakeholder_cue)),
@@ -565,12 +673,6 @@ def main() -> None:
             show_missed_insight=score < 9.0,
         )
         st.markdown(insight_html, unsafe_allow_html=True)
-
-        with st.expander("Full coach rationale", expanded=False):
-            st.markdown(
-                f"<p style='color:#44403c; line-height: 1.65;'>{html.escape(rationale).replace(chr(10), '<br/>')}</p>",
-                unsafe_allow_html=True,
-            )
 
     actions = tactical_game_plan_three(evaluation_data)
     bullets_html = "".join(
@@ -597,33 +699,57 @@ def main() -> None:
     )
 
     st.markdown("---")
-    st.markdown(
-        """
-        <h3 style="color:#292524; font-weight:600; margin:0.75rem 0 0.25rem 0;">Conversation transcript</h3>
-        <p style="color:#78716c; font-size:0.9rem; margin:0 0 0.5rem 0;">Full dialogue from the selected interview.</p>
-        """,
-        unsafe_allow_html=True,
-    )
-    turns = transcript_data.get("turns") or []
-    parts = [
-        "<div style='background:#fff; border:1px solid #e7e5e4; border-radius:12px; padding:1.25rem; margin-top:0.5rem;'>"
-    ]
-    for t in turns:
-        tid = t.get("turn_id", "")
-        speaker = html.escape(str(t.get("speaker", "?")))
-        text = html.escape(str(t.get("text", ""))).replace("\n", "<br/>")
-        parts.append(
-            f"<p style='color:#292524; font-weight:600; margin:0.75rem 0 0.25rem 0;'>Turn {tid} — {speaker}</p>"
+
+    # Conversation transcript — collapsible
+    with st.expander("Conversation transcript", expanded=False):
+        st.markdown(
+            "<p style='color:#78716c; font-size:0.9rem; margin:0 0 0.75rem 0;'>Full dialogue from the selected interview.</p>",
+            unsafe_allow_html=True,
         )
-        parts.append(
-            f"<p style='margin-left:0.75rem; padding:0.65rem 0.85rem; border-left:3px solid #d6d3d1; "
-            f"background:#fafaf9; border-radius:0 8px 8px 0; color:#44403c; line-height:1.55;'>{text}</p>"
+        turns = transcript_data.get("turns") or []
+        parts = [
+            "<div style='background:#fff; border:1px solid #e7e5e4; border-radius:12px; padding:1.25rem;'>"
+        ]
+        for t in turns:
+            tid = t.get("turn_id", "")
+            speaker = html.escape(str(t.get("speaker", "?")))
+            text = html.escape(str(t.get("text", ""))).replace("\n", "<br/>")
+            parts.append(
+                f"<p style='color:#292524; font-weight:600; margin:0.75rem 0 0.25rem 0;'>Turn {tid} — {speaker}</p>"
+            )
+            parts.append(
+                f"<p style='margin-left:0.75rem; padding:0.65rem 0.85rem; border-left:3px solid #d6d3d1; "
+                f"background:#fafaf9; border-radius:0 8px 8px 0; color:#44403c; line-height:1.55;'>{text}</p>"
+            )
+        parts.append("</div>")
+        st.markdown("".join(parts), unsafe_allow_html=True)
+
+    # Glossary — definitions for technical interview terms used in feedback
+    with st.expander("Glossary — interview technique terms", expanded=False):
+        st.markdown(
+            "<p style='color:#78716c; font-size:0.9rem; margin:0 0 0.75rem 0;'>"
+            "Definitions for common terms that may appear in coach feedback above.</p>",
+            unsafe_allow_html=True,
         )
-    parts.append("</div>")
-    st.markdown("".join(parts), unsafe_allow_html=True)
+        glossary_parts: List[str] = []
+        for i, entry in enumerate(GLOSSARY):
+            divider = "border-top: 1px solid #e7e5e4; margin-top: 0.85rem; padding-top: 0.85rem;" if i > 0 else ""
+            glossary_parts.append(
+                f'<div style="{divider}">'
+                f'<span style="font-weight:700; color:#292524; font-size:0.97rem;">{html.escape(entry["term"])}</span>'
+                f'<p style="color:#44403c; line-height:1.65; margin:0.3rem 0 0 0; font-size:0.93rem;">'
+                f'{html.escape(entry["definition"])}</p>'
+                f"</div>"
+            )
+        st.markdown(
+            "<div style='background:#fff; border:1px solid #e7e5e4; border-radius:12px; padding:1.25rem;'>"
+            + "".join(glossary_parts)
+            + "</div>",
+            unsafe_allow_html=True,
+        )
 
     st.sidebar.markdown("---")
-    st.sidebar.caption("Diagnostic Coach · IQR")
+    st.sidebar.caption("Interview Diagnostic Coach · IQR")
 
 
 if __name__ == "__main__":
